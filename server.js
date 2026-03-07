@@ -3,6 +3,8 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -22,7 +24,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// تسجيل حساب
+// تسجيل حساب وإرسال الكود
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -30,25 +32,32 @@ app.post("/register", async (req, res) => {
     return res.json({ message: "املأ كل البيانات" });
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000);
-
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
   codes[email] = code;
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Sudan Crypto Verification Code",
-    html: `<h2>Sudan Crypto</h2><p>كود التحقق هو:</p><h1>${code}</h1>`
-  });
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Sudan Crypto Verification Code",
+      html: `<h2>Sudan Crypto</h2><p>كود التحقق هو:</p><h1>${code}</h1>`
+    });
 
-  users[email] = { name, password, verified: false };
-
-  res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
+    users[email] = { name, password, verified: false };
+    res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
+  } catch (error) {
+    console.log("MAIL ERROR:", error);
+    res.status(500).json({ message: "فشل إرسال الكود" });
+  }
 });
 
 // تحقق من الكود
 app.post("/verify", (req, res) => {
   const { email, code } = req.body;
+
+  if (!users[email]) {
+    return res.json({ message: "الحساب غير موجود" });
+  }
 
   if (codes[email] == code) {
     users[email].verified = true;
@@ -79,31 +88,6 @@ app.post("/login", (req, res) => {
   res.json({ message: "تم تسجيل الدخول بنجاح" });
 });
 
-app.listen(3000, () => {
-  console.log("Server started");
-});
-app.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.json({ message: "املأ كل البيانات" });
-  }
-
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[email] = code;
-
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Sudan Crypto Verification Code",
-      html: `<h2>Sudan Crypto</h2><p>كود التحقق هو:</p><h1>${code}</h1>`
-    });
-
-    users[email] = { name, password, verified: false };
-    res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
-  } catch (error) {
-    console.log("MAIL ERROR:", error);
-    res.status(500).json({ message: "فشل إرسال الكود" });
-  }
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
