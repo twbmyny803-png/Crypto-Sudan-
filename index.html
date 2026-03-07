@@ -57,6 +57,17 @@
             margin-bottom: 25px;
         }
 
+        .form-group-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .form-group-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         label {
             display: block;
             color: #e0e6f0;
@@ -88,6 +99,51 @@
             box-shadow: 0 0 10px rgba(0, 191, 255, 0.2);
         }
 
+        .verify-btn {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #00bfff 0%, #7b2cbf 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+        }
+
+        .verify-btn:active {
+            transform: translateY(0);
+        }
+
+        .password-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .password-group {
+            flex: 1;
+        }
+
+        .forgot-password {
+            font-size: 12px;
+            color: #8899bb;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #00bfff;
+            text-decoration: underline;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 14px;
@@ -108,6 +164,29 @@
         }
 
         .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .reset-btn:active {
             transform: translateY(0);
         }
 
@@ -153,6 +232,34 @@
                 padding: 12px 14px;
                 font-size: 16px;
             }
+
+            .form-group-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group-row .form-group {
+                margin-bottom: 15px;
+            }
+
+            .verify-btn {
+                width: 100%;
+            }
+
+            .password-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .password-group {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .forgot-password {
+                display: block;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -160,7 +267,7 @@
     <div class="container">
         <div class="logo-section">
             <div class="logo-text">Sudan<br>Crypto</div>
-            <div class="subtitle">منصة التداول الآمنة</div>
+            <div class="subtitle">منصة الاستثمار الآمنة</div>
         </div>
 
         <form>
@@ -169,14 +276,20 @@
                 <input type="text" id="fullname" name="fullname" placeholder="أدخل اسمك الكامل" required>
             </div>
 
-            <div class="form-group">
-                <label for="email">البريد الإلكتروني</label>
-                <input type="email" id="email" name="email" placeholder="أدخل بريدك الإلكتروني" required>
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني</label>
+                    <input type="email" id="email" name="email" placeholder="أدخل بريدك الإلكتروني" required>
+                </div>
+                <button type="button" class="verify-btn">التحقق</button>
             </div>
 
-            <div class="form-group">
-                <label for="password">كلمة المرور</label>
-                <input type="password" id="password" name="password" placeholder="أنشئ كلمة مرور قوية" required>
+            <div class="password-section">
+                <div class="password-group">
+                    <label for="password">كلمة المرور</label>
+                    <input type="password" id="password" name="password" placeholder="أنشئ كلمة مرور قوية" required>
+                    <a href="#" class="forgot-password">هل نسيت كلمة السر؟</a>
+                </div>
             </div>
 
             <div class="form-group">
@@ -185,6 +298,8 @@
             </div>
 
             <button type="submit" class="submit-btn">إنشاء الحساب</button>
+
+            <button type="button" class="reset-btn">إعادة تعيين كلمة المرور عبر البريد الإلكتروني</button>
 
             <div class="login-link">
                 هل لديك حساب بالفعل؟ <a href="#">تسجيل الدخول</a>
