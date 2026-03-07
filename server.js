@@ -1,8 +1,14 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
+app.use(express.static(__dirname));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "register.html"));
+});
 
 let users = {};
 let codes = {};
@@ -18,7 +24,6 @@ const transporter = nodemailer.createTransport({
 
 // تسجيل حساب
 app.post("/register", async (req, res) => {
-
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -39,12 +44,10 @@ app.post("/register", async (req, res) => {
   users[email] = { name, password, verified: false };
 
   res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
-
 });
 
 // تحقق من الكود
 app.post("/verify", (req, res) => {
-
   const { email, code } = req.body;
 
   if (codes[email] == code) {
@@ -53,12 +56,10 @@ app.post("/verify", (req, res) => {
   } else {
     res.json({ message: "الكود غير صحيح" });
   }
-
 });
 
 // تسجيل الدخول
 app.post("/login", (req, res) => {
-
   const { email, password } = req.body;
 
   const user = users[email];
@@ -76,7 +77,6 @@ app.post("/login", (req, res) => {
   }
 
   res.json({ message: "تم تسجيل الدخول بنجاح" });
-
 });
 
 app.listen(3000, () => {
