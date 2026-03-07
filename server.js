@@ -1,6 +1,7 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +13,38 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "register.html"));
 });
 
-let users = {};
+const USERS_FILE = path.join(__dirname, "users.json");
+
+function ensureUsersFile() {
+  if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify({}, null, 2), "utf8");
+  }
+}
+
+function loadUsers() {
+  try {
+    ensureUsersFile();
+    const raw = fs.readFileSync(USERS_FILE, "utf8");
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    console.log("LOAD USERS ERROR:", error);
+    return {};
+  }
+}
+
+function saveUsers(users) {
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.log("SAVE USERS ERROR:", error);
+    return false;
+  }
+}
+
+ensureUsersFile();
+
+let users = loadUsers();
 let codes = {};
 
 // إعداد إرسال الإيميل
@@ -32,18 +64,33 @@ app.post("/register", async (req, res) => {
     return res.json({ message: "املأ كل البيانات" });
   }
 
+  const cleanEmail = String(email).trim().toLowerCase();
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[email] = code;
+
+  users = loadUsers();
+
+  // لو الحساب موجود من قبل، نحدّث بياناته ونرجع نطلب التحقق
+  users[cleanEmail] = {
+    name,
+    password,
+    verified: false
+  };
+
+  const saved = saveUsers(users);
+  if (!saved) {
+    return res.status(500).json({ message: "فشل حفظ الحساب" });
+  }
+
+  codes[cleanEmail] = code;
 
   try {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: cleanEmail,
       subject: "Sudan Crypto Verification Code",
       html: `<h2>Sudan Crypto</h2><p>كود التحقق هو:</p><h1>${code}</h1>`
     });
 
-    users[email] = { name, password, verified: false };
     res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
   } catch (error) {
     console.log("MAIL ERROR:", error);
@@ -54,13 +101,22 @@ app.post("/register", async (req, res) => {
 // تحقق من كود التسجيل
 app.post("/verify", (req, res) => {
   const { email, code } = req.body;
+  const cleanEmail = String(email || "").trim().toLowerCase();
 
-  if (!users[email]) {
+  users = loadUsers();
+
+  if (!users[cleanEmail]) {
     return res.json({ message: "الحساب غير موجود" });
   }
 
-  if (codes[email] == code) {
-    users[email].verified = true;
+  if (codes[cleanEmail] == code) {
+    users[cleanEmail].verified = true;
+
+    const saved = saveUsers(users);
+    if (!saved) {
+      return res.status(500).json({ message: "فشل تحديث حالة التحقق" });
+    }
+
     res.json({ message: "تم التحقق من البريد بنجاح" });
   } else {
     res.json({ message: "الكود غير صحيح" });
@@ -70,12 +126,14 @@ app.post("/verify", (req, res) => {
 // إرسال كود تسجيل الدخول
 app.post("/send-login-code", async (req, res) => {
   const { email } = req.body;
+  const cleanEmail = String(email || "").trim().toLowerCase();
 
-  if (!email) {
+  if (!cleanEmail) {
     return res.status(400).json({ message: "أدخل البريد الإلكتروني" });
   }
 
-  const user = users[email];
+  users = loadUsers();
+  const user = users[cleanEmail];
 
   if (!user) {
     return res.status(404).json({ message: "الحساب غير موجود" });
@@ -86,12 +144,12 @@ app.post("/send-login-code", async (req, res) => {
   }
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[email] = code;
+  codes[cleanEmail] = code;
 
   try {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: cleanEmail,
       subject: "Sudan Crypto Login Code",
       html: `<h2>Sudan Crypto</h2><p>كود تسجيل الدخول هو:</p><h1>${code}</h1>`
     });
@@ -106,8 +164,10 @@ app.post("/send-login-code", async (req, res) => {
 // تسجيل الدخول
 app.post("/login", (req, res) => {
   const { email, password, code } = req.body;
+  const cleanEmail = String(email || "").trim().toLowerCase();
 
-  const user = users[email];
+  users = loadUsers();
+  const user = users[cleanEmail];
 
   if (!user) {
     return res.json({ message: "الحساب غير موجود" });
@@ -125,7 +185,7 @@ app.post("/login", (req, res) => {
     return res.json({ message: "أدخل كود التحقق" });
   }
 
-  if (codes[email] != code) {
+  if (codes[cleanEmail] != code) {
     return res.json({ message: "كود التحقق غير صحيح" });
   }
 
