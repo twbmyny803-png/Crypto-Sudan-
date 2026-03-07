@@ -394,6 +394,12 @@
 
         if (data.message.includes("تم تسجيل الدخول")) {
           statusMsg.style.color = "#59f0a9";
+
+          localStorage.setItem("loggedInEmail", email);
+
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 1200);
         } else {
           statusMsg.style.color = "#ff9ca8";
         }
