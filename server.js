@@ -18,22 +18,27 @@ app.get("/", (req, res) => {
 ========================= */
 
 const pool = new Pool({
-  connectionString: "postgresql://sudancry:7C6UZe2r1Z5waNMYem0cKRwQYKHkAv2p@dpg-d6m79rf5r7bs73c90d60-a.oregon-postgres.render.com/sudancrypto",
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
 /* إنشاء جدول المستخدمين */
 
 async function createTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      name TEXT,
-      email TEXT UNIQUE,
-      password TEXT,
-      verified BOOLEAN DEFAULT false
-    )
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        email TEXT UNIQUE,
+        password TEXT,
+        verified BOOLEAN DEFAULT false
+      )
+    `);
+    console.log("Users table ready");
+  } catch (error) {
+    console.log("CREATE TABLE ERROR:", error);
+  }
 }
 
 createTable();
@@ -61,37 +66,42 @@ const transporter = nodemailer.createTransport({
 ========================= */
 
 app.post("/register", async (req, res) => {
-
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.json({ message: "املأ كل البيانات" });
   }
 
+  const cleanEmail = email.trim().toLowerCase();
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[email] = code;
+  codes[cleanEmail] = code;
 
   try {
-
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: cleanEmail,
       subject: "Sudan Crypto Verification Code",
       html: `<h2>Sudan Crypto</h2><p>كود التحقق:</p><h1>${code}</h1>`
     });
 
     await pool.query(
-      "INSERT INTO users (name,email,password) VALUES ($1,$2,$3)",
-      [name, email, password]
+      `
+      INSERT INTO users (name, email, password, verified)
+      VALUES ($1, $2, $3, false)
+      ON CONFLICT (email)
+      DO UPDATE SET
+        name = EXCLUDED.name,
+        password = EXCLUDED.password,
+        verified = false
+      `,
+      [name, cleanEmail, password]
     );
 
     res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
-
   } catch (error) {
-    console.log(error);
+    console.log("REGISTER ERROR:", error);
     res.json({ message: "فشل إنشاء الحساب" });
   }
-
 });
 
 /* =========================
@@ -99,20 +109,24 @@ app.post("/register", async (req, res) => {
 ========================= */
 
 app.post("/verify", async (req, res) => {
-
   const { email, code } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
 
-  if (codes[email] != code) {
+  if (codes[cleanEmail] != code) {
     return res.json({ message: "الكود غير صحيح" });
   }
 
-  await pool.query(
-    "UPDATE users SET verified=true WHERE email=$1",
-    [email]
-  );
+  try {
+    await pool.query(
+      "UPDATE users SET verified = true WHERE email = $1",
+      [cleanEmail]
+    );
 
-  res.json({ message: "تم التحقق من البريد بنجاح" });
-
+    res.json({ message: "تم التحقق من البريد بنجاح" });
+  } catch (error) {
+    console.log("VERIFY ERROR:", error);
+    res.json({ message: "فشل التحقق من البريد" });
+  }
 });
 
 /* =========================
@@ -120,42 +134,40 @@ app.post("/verify", async (req, res) => {
 ========================= */
 
 app.post("/send-login-code", async (req, res) => {
-
   const { email } = req.body;
-
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1",
-    [email]
-  );
-
-  const user = result.rows[0];
-
-  if (!user) {
-    return res.json({ message: "الحساب غير موجود" });
-  }
-
-  if (!user.verified) {
-    return res.json({ message: "يجب التحقق من البريد أولاً" });
-  }
-
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[email] = code;
+  const cleanEmail = (email || "").trim().toLowerCase();
 
   try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    if (!user.verified) {
+      return res.json({ message: "يجب التحقق من البريد أولاً" });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    codes[cleanEmail] = code;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: cleanEmail,
       subject: "Sudan Crypto Login Code",
       html: `<h2>Sudan Crypto</h2><p>كود تسجيل الدخول:</p><h1>${code}</h1>`
     });
 
     res.json({ message: "تم إرسال كود تسجيل الدخول إلى بريدك" });
-
   } catch (error) {
+    console.log("SEND LOGIN CODE ERROR:", error);
     res.json({ message: "فشل إرسال الكود" });
   }
-
 });
 
 /* =========================
@@ -163,34 +175,38 @@ app.post("/send-login-code", async (req, res) => {
 ========================= */
 
 app.post("/login", async (req, res) => {
-
   const { email, password, code } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
 
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1",
-    [email]
-  );
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [cleanEmail]
+    );
 
-  const user = result.rows[0];
+    const user = result.rows[0];
 
-  if (!user) {
-    return res.json({ message: "الحساب غير موجود" });
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    if (!user.verified) {
+      return res.json({ message: "يجب التحقق من البريد أولاً" });
+    }
+
+    if (user.password !== password) {
+      return res.json({ message: "كلمة المرور غير صحيحة" });
+    }
+
+    if (codes[cleanEmail] != code) {
+      return res.json({ message: "كود التحقق غير صحيح" });
+    }
+
+    res.json({ message: "تم تسجيل الدخول بنجاح" });
+  } catch (error) {
+    console.log("LOGIN ERROR:", error);
+    res.json({ message: "فشل تسجيل الدخول" });
   }
-
-  if (!user.verified) {
-    return res.json({ message: "يجب التحقق من البريد أولاً" });
-  }
-
-  if (user.password !== password) {
-    return res.json({ message: "كلمة المرور غير صحيحة" });
-  }
-
-  if (codes[email] != code) {
-    return res.json({ message: "كود التحقق غير صحيح" });
-  }
-
-  res.json({ message: "تم تسجيل الدخول بنجاح" });
-
 });
 
 /* =========================
