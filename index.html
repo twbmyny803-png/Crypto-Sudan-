@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudan Crypto</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: white;
+      background:
+        radial-gradient(circle at top left, rgba(0, 195, 255, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(138, 43, 226, 0.22), transparent 30%),
+        linear-gradient(135deg, #050816 0%, #0c122b 45%, #060913 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.4));
+      z-index: 0;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .glow.one {
+      width: 240px;
+      height: 240px;
+      background: #00c3ff;
+      top: 60px;
+      left: -30px;
+    }
+
+    .glow.two {
+      width: 280px;
+      height: 280px;
+      background: #7c3aed;
+      right: -40px;
+      bottom: 40px;
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero {
+      padding: 20px 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: #bfefff;
+      font-size: 13px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero h1 {
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      font-weight: 900;
+    }
+
+    .hero h1 span {
+      color: #00d2ff;
+      text-shadow: 0 0 18px rgba(0, 210, 255, 0.28);
+    }
+
+    .hero p {
+      max-width: 560px;
+      color: rgba(255,255,255,0.82);
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d8e6ff;
+      font-size: 13px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      min-width: 135px;
+      padding: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .stat span {
+      color: rgba(255,255,255,0.74);
+      font-size: 13px;
+    }
+
+    .login-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 28px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(0,195,255,0.24), transparent 70%);
+      top: -40px;
+      right: -30px;
+    }
+
+    .card-top {
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .demo-label {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 166, 0, 0.14);
+      color: #ffd48f;
+      font-size: 12px;
+      border: 1px solid rgba(255, 166, 0, 0.2);
+      margin-bottom: 14px;
+    }
+
+    .card-top h2 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .card-top p {
+      color: rgba(255,255,255,0.76);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #dbeafe;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(8, 15, 30, 0.72);
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .input-group input::placeholder {
+      color: rgba(255,255,255,0.42);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 6px 0 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .remember {
+      color: rgba(255,255,255,0.72);
+      font-size: 13px;
+    }
+
+    .forgot {
+      color: #7dd3fc;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #00c3ff, #7c3aed);
+      color: white;
+      box-shadow: 0 10px 26px rgba(0, 195, 255, 0.24);
+    }
+
+    .sub-links {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .sub-links a {
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      padding: 13px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white;
+      font-size: 14px;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      line-height: 1.7;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        overflow: auto;
+      }
+
+      .wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        text-align: center;
+      }
+
+      .hero p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .chips,
+      .stats {
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: 46px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+
+  <div class="page">
+    <div class="wrapper">
+      <div class="hero">
+        <div class="badge">Next Generation Crypto Demo Platform</div>
+        <h1>Welcome to <span>Sudan Crypto</span></h1>
+        <p>
+          A modern crypto-style demo interface with premium visuals for login,
+          account creation, and password recovery. This project is for
+          presentation and educational demo use only.
+        </p>
+
+        <div class="chips">
+          <div class="chip">Secure Interface</div>
+          <div class="chip">Crypto Dashboard Style</div>
+          <div class="chip">Modern Glass UI</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <b>24/7</b>
+            <span>Demo Access</span>
+          </div>
+          <div class="stat">
+            <b>Fast</b>
+            <span>Clean Experience</span>
+          </div>
+          <div class="stat">
+            <b>Modern</b>
+            <span>Crypto Visuals</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-card">
+        <div class="card-top">
+          <div class="demo-label">DEMO ONLY</div>
+          <h2>Sign In</h2>
+          <p>
+            Enter your account details to access the Sudan Crypto demo platform.
+          </p>
+        </div>
+
+        <div class="input-group">
+          <label>Email or Username</label>
+          <input type="text" placeholder="Enter your email or username">
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" placeholder="Enter your password">
+        </div>
+
+        <div class="row">
+          <div class="remember">Remember me</div>
+          <a class="forgot" href="forgot.html">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-primary">Login</button>
+
+        <div class="sub-links">
+          <a href="register.html">Create Account</a>
+          <a href="forgot.html">Reset Password</a>
+        </div>
+
+        <div class="notice">
+          Sudan Crypto is a demo visual platform only. No real investment, no
+          real deposits, and no real financial returns are provided through this
+          interface.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+  </html>
