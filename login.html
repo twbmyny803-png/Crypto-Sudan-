@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudan Crypto - دخول تسجيل</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Tahoma", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(0, 170, 255, 0.12), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(140, 82, 255, 0.12), transparent 30%),
+        linear-gradient(180deg, #07102b 0%, #09122f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 620px;
+      background: rgba(10, 20, 52, 0.92);
+      border: 1px solid rgba(85, 120, 255, 0.18);
+      border-radius: 36px;
+      padding: 40px 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .title {
+      font-size: 58px;
+      line-height: 1.05;
+      font-weight: 700;
+      color: #18b8ff;
+      margin-bottom: 14px;
+      text-align: left;
+      direction: ltr;
+    }
+
+    .subtitle {
+      color: #aeb8d8;
+      font-size: 18px;
+      margin-bottom: 34px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #eef3ff;
+    }
+
+    .input,
+    .code-input {
+      width: 100%;
+      height: 64px;
+      border-radius: 22px;
+      border: 1px solid rgba(65, 119, 255, 0.24);
+      background: #071634;
+      color: #fff;
+      padding: 0 20px;
+      font-size: 18px;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    .input::placeholder,
+    .code-input::placeholder {
+      color: #7f8aa8;
+    }
+
+    .input:focus,
+    .code-input:focus {
+      border-color: #24b5ff;
+      box-shadow: 0 0 0 4px rgba(36, 181, 255, 0.12);
+    }
+
+    .verify-box {
+      margin-top: 12px;
+      background: rgba(6, 19, 47, 0.7);
+      border: 1px solid rgba(71, 128, 255, 0.16);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .verify-title {
+      font-size: 16px;
+      color: #dfe7ff;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    .verify-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .verify-row .code-input {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .send-btn,
+    .verify-btn {
+      height: 64px;
+      border: none;
+      border-radius: 20px;
+      padding: 0 22px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.25s ease;
+      background: linear-gradient(90deg, #12b8ff, #7b35ff);
+      box-shadow: 0 10px 25px rgba(59, 117, 255, 0.25);
+    }
+
+    .send-btn:hover,
+    .verify-btn:hover,
+    .login-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .helper-text {
+      margin-top: 10px;
+      color: #9db0d1;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #77d3ff;
+      min-height: 22px;
+    }
+
+    .forgot {
+      text-align: right;
+      margin: 6px 0 26px;
+    }
+
+    .forgot a,
+    .bottom-link a {
+      color: #27c3ff;
+      text-decoration: none;
+      font-size: 17px;
+    }
+
+    .forgot a:hover,
+    .bottom-link a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 78px;
+      border: none;
+      border-radius: 26px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #18b9ff, #7d35ff);
+      box-shadow: 0 14px 30px rgba(68, 111, 255, 0.25);
+      margin-top: 12px;
+      transition: 0.25s ease;
+    }
+
+    .bottom-link {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 18px;
+      color: #aeb8d8;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 32px 20px;
+        border-radius: 28px;
+      }
+
+      .title {
+        font-size: 44px;
+      }
+
+      .login-btn {
+        height: 70px;
+        font-size: 22px;
+      }
+
+      .send-btn,
+      .verify-btn,
+      .input,
+      .code-input {
+        height: 58px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">Sudan<br>Crypto</h1>
+    <p class="subtitle">منصة الاستثمار الآمنة</p>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input
+          type="email"
+          id="email"
+          class="input"
+          placeholder="أدخل بريدك الإلكتروني"
+          required
+        />
+
+        <div class="verify-box">
+          <div class="verify-title">التحقق من البريد الإلكتروني بإرسال الكود</div>
+
+          <div class="verify-row" style="margin-bottom: 12px;">
+            <button type="button" class="send-btn" onclick="sendCode()">
+              إرسال كود التحقق
+            </button>
+          </div>
+
+          <div class="verify-row">
+            <input
+              type="text"
+              id="verificationCode"
+              class="code-input"
+              placeholder="أدخل كود التحقق"
+            />
+            <button type="button" class="verify-btn" onclick="verifyCode()">
+              تحقق من الكود
+            </button>
+          </div>
+
+          <div class="helper-text">
+            سيتم إرسال كود التحقق إلى بريدك الإلكتروني للتأكد من صحة الحساب قبل تسجيل الدخول.
+          </div>
+
+          <div class="status" id="statusMsg"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input
+          type="password"
+          id="password"
+          class="input"
+          placeholder="أدخل كلمة المرور"
+          required
+        />
+      </div>
+
+      <div class="forgot">
+        <a href="#">هل نسيت كلمة السر؟</a>
+      </div>
+
+      <button type="submit" class="login-btn">تسجيل الدخول</button>
+
+      <div class="bottom-link">
+        ليس لديك حساب؟ <a href="#">إنشاء حساب جديد</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let generatedCode = "";
+    let isVerified = false;
+
+    function sendCode() {
+      const email = document.getElementById("email").value.trim();
+      const statusMsg = document.getElementById("statusMsg");
+
+      if (!email) {
+        statusMsg.textContent = "الرجاء إدخال البريد الإلكتروني أولاً.";
+        statusMsg.style.color = "#ff9ca8";
+        return;
+      }
+
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      isVerified = false;
+
+      statusMsg.textContent = "تم إرسال كود التحقق إلى بريدك الإلكتروني. الكود التجريبي: " + generatedCode;
+      statusMsg.style.color = "#77d3ff";
+
+      // هنا تقدر تربط API حقيقي لإرسال الكود إلى الإيميل
+      // مثال:
+      // fetch('/send-code', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email: email, code: generatedCode })
+      // })
+    }
+
+    function verifyCode() {
+      const enteredCode = document.getElementById("verificationCode").value.trim();
+      const statusMsg = document.getElementById("statusMsg");
+
+      if (!enteredCode) {
+        statusMsg.textContent = "الرجاء إدخال كود التحقق.";
+        statusMsg.style.color = "#ff9ca8";
+        return;
+      }
+
+      if (enteredCode === generatedCode && generatedCode !== "") {
+        isVerified = true;
+        statusMsg.textContent = "تم التحقق من البريد الإلكتروني بنجاح.";
+        statusMsg.style.color = "#59f0a9";
+      } else {
+        isVerified = false;
+        statusMsg.textContent = "كود التحقق غير صحيح.";
+        statusMsg.style.color = "#ff9ca8";
+      }
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const statusMsg = document.getElementById("statusMsg");
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        statusMsg.textContent = "الرجاء تعبئة جميع الحقول.";
+        statusMsg.style.color = "#ff9ca8";
+        return;
+      }
+
+      if (!isVerified) {
+        statusMsg.textContent = "يجب التحقق من البريد الإلكتروني أولاً قبل تسجيل الدخول.";
+        statusMsg.style.color = "#ff9ca8";
+        return;
+      }
+
+      statusMsg.textContent = "تم تسجيل الدخول بنجاح.";
+      statusMsg.style.color = "#59f0a9";
+
+      // هنا تضيف كود تسجيل الدخول الحقيقي
+      // fetch('/login', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email, password })
+      // })
+    });
+  </script>
+</body>
+          </html>
