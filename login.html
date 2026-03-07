@@ -150,6 +150,7 @@
       font-size: 14px;
       color: #77d3ff;
       min-height: 22px;
+      line-height: 1.8;
     }
 
     .forgot {
@@ -235,7 +236,7 @@
           <div class="verify-title">التحقق من البريد الإلكتروني بإرسال الكود</div>
 
           <div class="verify-row" style="margin-bottom: 12px;">
-            <button type="button" class="send-btn" onclick="sendCode()">
+            <button type="button" class="send-btn" onclick="sendLoginCode()">
               إرسال كود التحقق
             </button>
           </div>
@@ -247,7 +248,7 @@
               class="code-input"
               placeholder="أدخل كود التحقق"
             />
-            <button type="button" class="verify-btn" onclick="verifyCode()">
+            <button type="button" class="verify-btn" onclick="checkCodeOnly()">
               تحقق من الكود
             </button>
           </div>
@@ -272,24 +273,26 @@
       </div>
 
       <div class="forgot">
-        <a href="#">هل نسيت كلمة السر؟</a>
+        <a href="forgot.html">هل نسيت كلمة السر؟</a>
       </div>
 
       <button type="submit" class="login-btn">تسجيل الدخول</button>
 
       <div class="bottom-link">
-        ليس لديك حساب؟ <a href="#">إنشاء حساب جديد</a>
+        ليس لديك حساب؟ <a href="register.html">إنشاء حساب جديد</a>
       </div>
     </form>
   </div>
 
   <script>
-    let generatedCode = "";
-    let isVerified = false;
+    let countdown = 60;
+    let timer = null;
+    let codeChecked = false;
 
-    function sendCode() {
+    const statusMsg = document.getElementById("statusMsg");
+
+    async function sendLoginCode() {
       const email = document.getElementById("email").value.trim();
-      const statusMsg = document.getElementById("statusMsg");
 
       if (!email) {
         statusMsg.textContent = "الرجاء إدخال البريد الإلكتروني أولاً.";
@@ -297,71 +300,109 @@
         return;
       }
 
-      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-      isVerified = false;
+      try {
+        const res = await fetch("/send-login-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email })
+        });
 
-      statusMsg.textContent = "تم إرسال كود التحقق إلى بريدك الإلكتروني. الكود التجريبي: " + generatedCode;
-      statusMsg.style.color = "#77d3ff";
+        const data = await res.json();
+        statusMsg.textContent = data.message;
 
-      // هنا تقدر تربط API حقيقي لإرسال الكود إلى الإيميل
-      // مثال:
-      // fetch('/send-code', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email: email, code: generatedCode })
-      // })
+        if (res.ok) {
+          statusMsg.style.color = "#77d3ff";
+          codeChecked = false;
+          startCountdown();
+        } else {
+          statusMsg.style.color = "#ff9ca8";
+        }
+      } catch (error) {
+        console.log(error);
+        statusMsg.textContent = "حصل خطأ في الاتصال بالسيرفر";
+        statusMsg.style.color = "#ff9ca8";
+      }
     }
 
-    function verifyCode() {
-      const enteredCode = document.getElementById("verificationCode").value.trim();
-      const statusMsg = document.getElementById("statusMsg");
+    function startCountdown() {
+      clearInterval(timer);
+      countdown = 60;
 
-      if (!enteredCode) {
+      timer = setInterval(() => {
+        statusMsg.textContent = "تم إرسال كود التحقق (" + countdown + " ثانية)";
+        statusMsg.style.color = "#77d3ff";
+        countdown--;
+
+        if (countdown < 0) {
+          clearInterval(timer);
+          statusMsg.textContent = "يمكنك إعادة إرسال الكود الآن";
+          statusMsg.style.color = "#59f0a9";
+        }
+      }, 1000);
+    }
+
+    function checkCodeOnly() {
+      const code = document.getElementById("verificationCode").value.trim();
+
+      if (!code) {
         statusMsg.textContent = "الرجاء إدخال كود التحقق.";
         statusMsg.style.color = "#ff9ca8";
         return;
       }
 
-      if (enteredCode === generatedCode && generatedCode !== "") {
-        isVerified = true;
-        statusMsg.textContent = "تم التحقق من البريد الإلكتروني بنجاح.";
-        statusMsg.style.color = "#59f0a9";
-      } else {
-        isVerified = false;
-        statusMsg.textContent = "كود التحقق غير صحيح.";
-        statusMsg.style.color = "#ff9ca8";
-      }
+      codeChecked = true;
+      statusMsg.textContent = "تم إدخال كود التحقق، أكمل تسجيل الدخول.";
+      statusMsg.style.color = "#59f0a9";
     }
 
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const statusMsg = document.getElementById("statusMsg");
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
+      const code = document.getElementById("verificationCode").value.trim();
 
-      if (!email || !password) {
+      if (!email || !password || !code) {
         statusMsg.textContent = "الرجاء تعبئة جميع الحقول.";
         statusMsg.style.color = "#ff9ca8";
         return;
       }
 
-      if (!isVerified) {
-        statusMsg.textContent = "يجب التحقق من البريد الإلكتروني أولاً قبل تسجيل الدخول.";
+      if (!codeChecked) {
+        statusMsg.textContent = "اضغط تحقق من الكود أولاً.";
         statusMsg.style.color = "#ff9ca8";
         return;
       }
 
-      statusMsg.textContent = "تم تسجيل الدخول بنجاح.";
-      statusMsg.style.color = "#59f0a9";
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            code
+          })
+        });
 
-      // هنا تضيف كود تسجيل الدخول الحقيقي
-      // fetch('/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // })
+        const data = await res.json();
+        statusMsg.textContent = data.message;
+
+        if (data.message.includes("تم تسجيل الدخول")) {
+          statusMsg.style.color = "#59f0a9";
+        } else {
+          statusMsg.style.color = "#ff9ca8";
+        }
+      } catch (error) {
+        console.log(error);
+        statusMsg.textContent = "حصل خطأ في الاتصال بالسيرفر";
+        statusMsg.style.color = "#ff9ca8";
+      }
     });
   </script>
 </body>
-          </html>
+</html>
