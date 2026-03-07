@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudan Crypto - العروض</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Tajawal, Arial, sans-serif;
+    }
+
+    body{
+      background:linear-gradient(180deg,#071c46,#061636);
+      color:#fff;
+      padding-bottom:90px;
+    }
+
+    .header{
+      padding:24px 18px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .title{
+      font-size:24px;
+      font-weight:700;
+      color:#1ec7ff;
+    }
+
+    .sub{
+      color:#b9c9ea;
+      font-size:14px;
+      margin-top:6px;
+    }
+
+    .top-card{
+      margin:0 16px 18px;
+      background:rgba(8,23,58,.95);
+      border:1px solid rgba(81,131,255,.15);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:0 15px 40px rgba(0,0,0,.22);
+    }
+
+    .top-card h2{
+      font-size:20px;
+      margin-bottom:10px;
+    }
+
+    .top-card p{
+      color:#c4d0ea;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin:18px 16px;
+    }
+
+    .stat-box{
+      background:rgba(8,23,58,.95);
+      border:1px solid rgba(81,131,255,.15);
+      border-radius:18px;
+      padding:16px 10px;
+      text-align:center;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:700;
+      color:#fff;
+      margin-bottom:8px;
+    }
+
+    .stat-label{
+      color:#b9c9ea;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .section{
+      margin:20px 16px;
+    }
+
+    .section-title{
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    .offers-list{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .offer-card{
+      background:rgba(8,23,58,.95);
+      border:1px solid rgba(81,131,255,.15);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 15px 40px rgba(0,0,0,.2);
+    }
+
+    .offer-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .offer-title{
+      font-size:18px;
+      font-weight:700;
+    }
+
+    .badge{
+      background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+      color:#fff;
+      padding:8px 12px;
+      border-radius:14px;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .offer-desc{
+      color:#c4d0ea;
+      font-size:14px;
+      line-height:1.8;
+      margin-bottom:14px;
+    }
+
+    .offer-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .mini-box{
+      background:#081532;
+      border:1px solid rgba(81,131,255,.12);
+      border-radius:16px;
+      padding:12px 8px;
+      text-align:center;
+    }
+
+    .mini-value{
+      font-size:17px;
+      font-weight:700;
+      color:#1fe28a;
+      margin-bottom:6px;
+    }
+
+    .mini-label{
+      font-size:12px;
+      color:#b9c9ea;
+      line-height:1.5;
+    }
+
+    .offer-btn{
+      width:100%;
+      height:52px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+      color:#fff;
+      font-size:17px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .bottom-nav{
+      position:fixed;
+      bottom:0;
+      right:0;
+      left:0;
+      background:#081532;
+      display:flex;
+      justify-content:space-around;
+      padding:10px 0;
+      border-top:1px solid #162a5a;
+      z-index:100;
+    }
+
+    .bottom-nav a{
+      text-align:center;
+      font-size:12px;
+      color:white;
+      text-decoration:none;
+      line-height:1.6;
+    }
+
+    .bottom-nav a.active{
+      color:#1ec7ff;
+      font-weight:700;
+    }
+
+    @media (max-width: 520px){
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .offer-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <div class="title">العروض</div>
+      <div class="sub">تابع أفضل الباقات والعروض المتاحة الآن</div>
+    </div>
+  </div>
+
+  <div class="top-card">
+    <h2>عروض السودان كريبتو</h2>
+    <p>
+      اختر العرض المناسب لك وابدأ في تنمية حسابك. جميع العروض مصممة
+      لتوفير أفضل عائد ممكن مع تجربة استخدام سهلة وآمنة داخل المنصة.
+    </p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-value">5</div>
+      <div class="stat-label">عدد العروض المتاحة</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">+30%</div>
+      <div class="stat-label">أفضل عائد مميز</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">24/7</div>
+      <div class="stat-label">دعم ومتابعة</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">العروض الحالية</div>
+
+    <div class="offers-list">
+
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-title">عرض البداية</div>
+          <div class="badge">الأكثر طلبًا</div>
+        </div>
+        <div class="offer-desc">
+          مناسب للمستخدمين الجدد الراغبين في بدء الاستثمار بمبلغ بسيط وعائد ثابت.
+        </div>
+        <div class="offer-grid">
+          <div class="mini-box">
+            <div class="mini-value">30 USDT</div>
+            <div class="mini-label">سعر العرض</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">2.5 USDT</div>
+            <div class="mini-label">الربح اليومي</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">180 يوم</div>
+            <div class="mini-label">مدة العرض</div>
+          </div>
+        </div>
+        <button class="offer-btn">اشترك الآن</button>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-title">عرض النجمتين</div>
+          <div class="badge">عائد جيد</div>
+        </div>
+        <div class="offer-desc">
+          للمستخدمين الذين يريدون زيادة الأرباح اليومية بعرض متوسط وقوي.
+        </div>
+        <div class="offer-grid">
+          <div class="mini-box">
+            <div class="mini-value">50 USDT</div>
+            <div class="mini-label">سعر العرض</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">4.5 USDT</div>
+            <div class="mini-label">الربح اليومي</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">180 يوم</div>
+            <div class="mini-label">مدة العرض</div>
+          </div>
+        </div>
+        <button class="offer-btn">اشترك الآن</button>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-title">عرض الثلاث نجوم</div>
+          <div class="badge">مميز</div>
+        </div>
+        <div class="offer-desc">
+          عرض قوي لمن يريد عائدًا يوميًا أعلى وتحقيق دخل أفضل من الباقات الأساسية.
+        </div>
+        <div class="offer-grid">
+          <div class="mini-box">
+            <div class="mini-value">90 USDT</div>
+            <div class="mini-label">سعر العرض</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">12 USDT</div>
+            <div class="mini-label">الربح اليومي</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">180 يوم</div>
+            <div class="mini-label">مدة العرض</div>
+          </div>
+        </div>
+        <button class="offer-btn">اشترك الآن</button>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-title">عرض الأربعة نجوم</div>
+          <div class="badge">احترافي</div>
+        </div>
+        <div class="offer-desc">
+          باقة احترافية بعائد يومي مرتفع مناسبة للحسابات النشطة.
+        </div>
+        <div class="offer-grid">
+          <div class="mini-box">
+            <div class="mini-value">120 USDT</div>
+            <div class="mini-label">سعر العرض</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">18 USDT</div>
+            <div class="mini-label">الربح اليومي</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">180 يوم</div>
+            <div class="mini-label">مدة العرض</div>
+          </div>
+        </div>
+        <button class="offer-btn">اشترك الآن</button>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-title">عرض الخمس نجوم</div>
+          <div class="badge">VIP</div>
+        </div>
+        <div class="offer-desc">
+          أعلى العروض المتوفرة حاليًا بعائد يومي ممتاز للمستخدمين المتقدمين.
+        </div>
+        <div class="offer-grid">
+          <div class="mini-box">
+            <div class="mini-value">200 USDT</div>
+            <div class="mini-label">سعر العرض</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">30 USDT</div>
+            <div class="mini-label">الربح اليومي</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-value">180 يوم</
