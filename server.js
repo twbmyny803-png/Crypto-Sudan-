@@ -51,7 +51,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// تحقق من الكود
+// تحقق من كود التسجيل
 app.post("/verify", (req, res) => {
   const { email, code } = req.body;
 
@@ -67,9 +67,45 @@ app.post("/verify", (req, res) => {
   }
 });
 
+// إرسال كود تسجيل الدخول
+app.post("/send-login-code", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  const user = users[email];
+
+  if (!user) {
+    return res.status(404).json({ message: "الحساب غير موجود" });
+  }
+
+  if (!user.verified) {
+    return res.status(403).json({ message: "يجب التحقق من البريد أولاً" });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  codes[email] = code;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Sudan Crypto Login Code",
+      html: `<h2>Sudan Crypto</h2><p>كود تسجيل الدخول هو:</p><h1>${code}</h1>`
+    });
+
+    res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
+  } catch (error) {
+    console.log("LOGIN MAIL ERROR:", error);
+    res.status(500).json({ message: "فشل إرسال كود تسجيل الدخول" });
+  }
+});
+
 // تسجيل الدخول
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, code } = req.body;
 
   const user = users[email];
 
@@ -83,6 +119,14 @@ app.post("/login", (req, res) => {
 
   if (user.password !== password) {
     return res.json({ message: "كلمة المرور غير صحيحة" });
+  }
+
+  if (!code) {
+    return res.json({ message: "أدخل كود التحقق" });
+  }
+
+  if (codes[email] != code) {
+    return res.json({ message: "كود التحقق غير صحيح" });
   }
 
   res.json({ message: "تم تسجيل الدخول بنجاح" });
