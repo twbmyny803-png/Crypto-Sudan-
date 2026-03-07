@@ -6,7 +6,6 @@
 <title>Sudan Crypto</title>
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -57,6 +56,7 @@ overflow:hidden;
 .banner img{
 width:100%;
 border-radius:20px;
+display:block;
 }
 
 .menu{
@@ -67,10 +67,21 @@ gap:10px;
 margin:20px;
 }
 
+.menu-link{
+text-decoration:none;
+color:white;
+display:block;
+}
+
 .menu-item{
 padding:15px;
 background:#0c183c;
 border-radius:20px;
+min-height:110px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
 }
 
 .menu-item img{
@@ -80,21 +91,35 @@ margin-bottom:10px;
 
 .menu-item p{
 font-size:13px;
+line-height:1.5;
 }
 
 .section{
 margin:20px;
 }
 
+.section-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+}
+
 .section-title{
 font-size:18px;
-margin-bottom:10px;
+}
+
+.more-link{
+color:#d7e6ff;
+text-decoration:none;
+font-size:15px;
 }
 
 .movies{
 display:flex;
 gap:10px;
 overflow:auto;
+padding-bottom:6px;
 }
 
 .movie{
@@ -104,24 +129,35 @@ min-width:120px;
 .movie img{
 width:100%;
 border-radius:10px;
+display:block;
 }
 
 .bottom-nav{
 position:fixed;
 bottom:0;
-width:100%;
+right:0;
+left:0;
 background:#081532;
 display:flex;
 justify-content:space-around;
 padding:10px 0;
 border-top:1px solid #162a5a;
+z-index:100;
 }
 
-.bottom-nav div{
+.bottom-nav a{
 text-align:center;
 font-size:12px;
+color:white;
+text-decoration:none;
+line-height:1.6;
 }
 
+@media (max-width: 520px){
+.menu{
+grid-template-columns:repeat(2,1fr);
+}
+}
 </style>
 
 </head>
@@ -129,90 +165,101 @@ font-size:12px;
 <body>
 
 <div class="header">
-<div class="logo">Sudan Crypto</div>
+  <div class="logo">Sudan Crypto</div>
 
-<div class="icons">
-🛍
-🌐
-🎧
-</div>
+  <div class="icons">
+    🛍
+    🌐
+    🎧
+  </div>
 </div>
 
 <div class="notice">
-ادعُ أصدقاءك واربح مكافآت مع منصة السودان كريبتو
+  ادعُ أصدقاءك واربح مكافآت مع منصة السودان كريبتو
 </div>
 
 <div class="banner">
-<img src="https://images.unsplash.com/photo-1639322537228-f710d846310a">
+  <img src="https://images.unsplash.com/photo-1639322537228-f710d846310a" alt="banner">
 </div>
 
 <div class="menu">
 
-<div class="menu-item">
-<img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png">
-<p>دعوة صديق</p>
-</div>
+  <a href="#" class="menu-link">
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">
+      <p>دعوة صديق</p>
+    </div>
+  </a>
 
-<div class="menu-item">
-<img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
-<p>العضوية</p>
-</div>
+  <a href="membership.html" class="menu-link">
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="">
+      <p>العضوية</p>
+    </div>
+  </a>
 
-<div class="menu-item">
-<img src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png">
-<p>شرح النظام</p>
-</div>
+  <a href="#" class="menu-link">
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png" alt="">
+      <p>شرح النظام</p>
+    </div>
+  </a>
 
-<div class="menu-item">
-<img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png">
-<p>الشركاء</p>
-</div>
+  <a href="#" class="menu-link">
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" alt="">
+      <p>الشركاء</p>
+    </div>
+  </a>
 
 </div>
 
 <div class="section">
-<div class="section-title">الأفلام الشائعة</div>
+  <div class="section-header">
+    <div class="section-title">الأفلام الشائعة</div>
+    <a href="#" class="more-link">عرض المزيد</a>
+  </div>
 
-<div class="movies">
+  <div class="movies">
 
-<div class="movie">
-<img src="https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg">
-</div>
+    <div class="movie">
+      <img src="https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" alt="">
+    </div>
 
-<div class="movie">
-<img src="https://image.tmdb.org/t/p/w500/pFlaoHTZeyNkG83vxsAJiGzfSsa.jpg">
-</div>
+    <div class="movie">
+      <img src="https://image.tmdb.org/t/p/w500/pFlaoHTZeyNkG83vxsAJiGzfSsa.jpg" alt="">
+    </div>
 
-<div class="movie">
-<img src="https://image.tmdb.org/t/p/w500/v2LilmCylr3bL9TCZSj6syjowZh.jpg">
-</div>
+    <div class="movie">
+      <img src="https://image.tmdb.org/t/p/w500/v2LilmCylr3bL9TCZSj6syjowZh.jpg" alt="">
+    </div>
 
-</div>
+  </div>
 </div>
 
 <div class="bottom-nav">
 
-<div>
-🏠
-<p>الرئيسية</p>
-</div>
+  <a href="dashboard.html">
+    🏠
+    <p>الرئيسية</p>
+  </a>
 
-<div>
-📢
-<p>العروض</p>
-</div>
+  <a href="#">
+    📢
+    <p>العروض</p>
+  </a>
 
-<div>
-📄
-<p>السجل</p>
-</div>
+  <a href="#">
+    📄
+    <p>السجل</p>
+  </a>
 
-<div>
-👤
-<p>حسابي</p>
-</div>
+  <a href="#">
+    👤
+    <p>حسابي</p>
+  </a>
 
 </div>
 
 </body>
-  </html>
+</html>
