@@ -1,444 +1,240 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudan Crypto - إنشاء حساب</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Tahoma, Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudan Crypto - إنشاء حساب</title>
 
-    body {
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top right, rgba(0, 162, 255, 0.12), transparent 28%),
-        radial-gradient(circle at bottom left, rgba(137, 67, 255, 0.12), transparent 30%),
-        linear-gradient(180deg, #071131 0%, #08122e 100%);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 24px 14px;
-      color: #fff;
-    }
+<style>
 
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(10, 20, 52, 0.95);
-      border: 1px solid rgba(86, 127, 255, 0.14);
-      border-radius: 36px;
-      padding: 34px 20px 28px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tahoma, Arial;
+}
 
-    .logo {
-      text-align: center;
-      margin-bottom: 8px;
-    }
+body{
+background:linear-gradient(180deg,#071131,#08122e);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
 
-    .logo h1 {
-      color: #16c1ff;
-      font-size: 58px;
-      line-height: 0.95;
-      font-weight: 800;
-      direction: ltr;
-      display: inline-block;
-    }
+.container{
+width:100%;
+max-width:420px;
+background:#0b1535;
+padding:30px 20px;
+border-radius:25px;
+box-shadow:0 20px 50px rgba(0,0,0,0.4);
+}
 
-    .subtitle {
-      text-align: center;
-      color: #aab7d7;
-      font-size: 17px;
-      margin-bottom: 28px;
-    }
+.logo{
+text-align:center;
+font-size:40px;
+color:#1cc4ff;
+margin-bottom:5px;
+}
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+.subtitle{
+text-align:center;
+color:#9fb0d3;
+margin-bottom:25px;
+}
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      color: #f2f6ff;
-      font-size: 18px;
-      font-weight: 600;
-    }
+label{
+display:block;
+margin-bottom:6px;
+margin-top:15px;
+}
 
-    .input {
-      width: 100%;
-      height: 68px;
-      border-radius: 22px;
-      border: 1px solid rgba(67, 121, 255, 0.20);
-      background: #071634;
-      color: #fff;
-      font-size: 18px;
-      padding: 0 20px;
-      outline: none;
-      transition: 0.25s;
-    }
+input{
+width:100%;
+height:50px;
+border:none;
+border-radius:12px;
+padding:0 15px;
+background:#06122b;
+color:white;
+font-size:15px;
+}
 
-    .input::placeholder {
-      color: #7583a4;
-    }
+input::placeholder{
+color:#8896b3;
+}
 
-    .input:focus {
-      border-color: #20bcff;
-      box-shadow: 0 0 0 4px rgba(32, 188, 255, 0.10);
-    }
+button{
+width:100%;
+height:50px;
+border:none;
+border-radius:14px;
+margin-top:10px;
+background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+color:white;
+font-size:16px;
+cursor:pointer;
+}
 
-    .verify-box {
-      margin-top: 14px;
-      padding: 16px;
-      background: rgba(6, 18, 45, 0.85);
-      border: 1px solid rgba(74, 131, 255, 0.14);
-      border-radius: 24px;
-    }
+.verify-box{
+margin-top:10px;
+}
 
-    .verify-title {
-      font-size: 15px;
-      color: #dce5ff;
-      margin-bottom: 12px;
-      font-weight: 700;
-    }
+.verify-row{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
 
-    .verify-desc {
-      color: #9fb0d3;
-      font-size: 14px;
-      line-height: 1.8;
-      margin-bottom: 14px;
-    }
+.verify-row input{
+flex:1;
+}
 
-    .send-code-btn {
-      width: 100%;
-      height: 54px;
-      border: none;
-      border-radius: 18px;
-      cursor: pointer;
-      font-size: 17px;
-      font-weight: 700;
-      color: #fff;
-      background: linear-gradient(90deg, #10bbff, #7b38ff);
-      box-shadow: 0 10px 24px rgba(55, 113, 255, 0.20);
-      transition: 0.25s;
-      margin-bottom: 14px;
-    }
+.verify-row button{
+width:120px;
+}
 
-    .send-code-btn:hover,
-    .verify-btn:hover,
-    .register-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.97;
-    }
+.status{
+margin-top:10px;
+font-size:14px;
+color:#7ed8ff;
+text-align:center;
+}
 
-    .verify-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+.register-btn{
+height:60px;
+font-size:18px;
+margin-top:20px;
+}
 
-    .verify-row .input {
-      flex: 1;
-      min-width: 180px;
-      height: 58px;
-      border-radius: 18px;
-      font-size: 17px;
-    }
+.footer{
+margin-top:20px;
+text-align:center;
+font-size:14px;
+color:#9fb0d3;
+}
 
-    .verify-btn {
-      min-width: 120px;
-      height: 58px;
-      border: none;
-      border-radius: 18px;
-      padding: 0 18px;
-      cursor: pointer;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #14bbff, #6f40ff);
-      transition: 0.25s;
-    }
+.footer a{
+color:#1cc4ff;
+text-decoration:none;
+}
 
-    .status-msg {
-      margin-top: 12px;
-      min-height: 22px;
-      font-size: 14px;
-      color: #7ed8ff;
-    }
-
-    .register-btn {
-      width: 100%;
-      height: 82px;
-      border: none;
-      border-radius: 26px;
-      cursor: pointer;
-      margin-top: 8px;
-      color: #fff;
-      font-size: 25px;
-      font-weight: 800;
-      background: linear-gradient(90deg, #15bbff, #8a35ff);
-      box-shadow: 0 14px 30px rgba(64, 110, 255, 0.24);
-      transition: 0.25s;
-    }
-
-    .login-link {
-      text-align: center;
-      color: #aab7d7;
-      font-size: 18px;
-      margin-top: 24px;
-      margin-bottom: 22px;
-    }
-
-    .login-link a {
-      color: #18c3ff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
-    }
-
-    .note-box {
-      border: 1px solid rgba(71, 125, 255, 0.14);
-      background: rgba(8, 22, 51, 0.65);
-      border-radius: 22px;
-      padding: 20px 16px;
-      color: #ccd7f2;
-      font-size: 15px;
-      line-height: 1.9;
-      text-align: center;
-    }
-
-    .optional {
-      color: #8fa0c5;
-      font-size: 14px;
-      font-weight: 500;
-      margin-right: 6px;
-    }
-
-    @media (max-width: 600px) {
-      .card {
-        padding: 28px 16px 22px;
-        border-radius: 30px;
-      }
-
-      .logo h1 {
-        font-size: 52px;
-      }
-
-      .input {
-        height: 62px;
-        font-size: 17px;
-      }
-
-      .register-btn {
-        height: 74px;
-        font-size: 22px;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="logo">
-      <h1>Sudan<br>Crypto</h1>
-    </div>
 
-    <div class="subtitle">منصة الاستثمار الآمنة</div>
+<div class="container">
 
-    <form id="registerForm">
-      <div class="form-group">
-        <label for="fullname">الاسم الكامل</label>
-        <input
-          type="text"
-          id="fullname"
-          class="input"
-          placeholder="أدخل اسمك الكامل"
-          required
-        />
-      </div>
+<div class="logo">Sudan Crypto</div>
+<div class="subtitle">منصة الاستثمار الآمنة</div>
 
-      <div class="form-group">
-        <label for="email">البريد الإلكتروني</label>
-        <input
-          type="email"
-          id="email"
-          class="input"
-          placeholder="أدخل بريدك الإلكتروني"
-          required
-        />
+<form id="registerForm">
 
-        <div class="verify-box">
-          <div class="verify-title">التحقق من البريد الإلكتروني</div>
-          <div class="verify-desc">
-            قم بإرسال كود التحقق إلى بريدك الإلكتروني، ثم أدخل الكود في الخانة التالية لتأكيد البريد الإلكتروني قبل إنشاء الحساب.
-          </div>
+<label>الاسم الكامل</label>
+<input type="text" placeholder="أدخل اسمك الكامل" required>
 
-          <button type="button" class="send-code-btn" onclick="sendVerificationCode()">
-            إرسال كود التحقق
-          </button>
+<label>البريد الإلكتروني</label>
+<input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
 
-          <div class="verify-row">
-            <input
-              type="text"
-              id="verificationCode"
-              class="input"
-              placeholder="أدخل كود التحقق"
-            />
-            <button type="button" class="verify-btn" onclick="verifyEmailCode()">
-              تحقق
-            </button>
-          </div>
+<div class="verify-box">
 
-          <div class="status-msg" id="statusMsg"></div>
-        </div>
-      </div>
+<button type="button" onclick="sendCode()">إرسال كود التحقق</button>
 
-      <div class="form-group">
-        <label for="password">كلمة المرور</label>
-        <input
-          type="password"
-          id="password"
-          class="input"
-          placeholder="أنشئ كلمة مرور قوية"
-          required
-        />
-      </div>
+<div class="verify-row">
+<input type="text" id="code" placeholder="أدخل كود التحقق">
+<button type="button" onclick="verifyCode()">تحقق</button>
+</div>
 
-      <div class="form-group">
-        <label for="confirmPassword">تأكيد كلمة المرور</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          class="input"
-          placeholder="أعد إدخال كلمة المرور"
-          required
-        />
-      </div>
+<div class="status" id="statusMsg"></div>
 
-      <div class="form-group">
-        <label for="referralCode">
-          كود الإحالة
-          <span class="optional">(اختياري)</span>
-        </label>
-        <input
-          type="text"
-          id="referralCode"
-          class="input"
-          placeholder="اتركه فارغًا إذا لم يكن لديك كود إحالة"
-        />
-      </div>
+</div>
 
-      <button type="submit" class="register-btn">إنشاء الحساب</button>
+<label>كلمة المرور</label>
+<input type="password" placeholder="أنشئ كلمة مرور قوية" required>
 
-      <div class="login-link">
-        هل لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
-      </div>
+<label>تأكيد كلمة المرور</label>
+<input type="password" placeholder="أعد إدخال كلمة المرور" required>
 
-      <div class="note-box">
-        بإنشاء حسابك، فإنك توافق على شروط الخدمة وسياسة الخصوصية الخاصة بنا.
-        جميع المعاملات محمية بأعلى معايير الأمان.
-      </div>
-    </form>
-  </div>
+<label>كود الإحالة (اختياري)</label>
+<input type="text" placeholder="اتركه فارغ إذا لم يكن لديك كود">
 
-  <script>
-    let generatedCode = "";
-    let emailVerified = false;
+<button class="register-btn">إنشاء الحساب</button>
 
-    function sendVerificationCode() {
-      const email = document.getElementById("email").value.trim();
-      const statusMsg = document.getElementById("statusMsg");
+</form>
 
-      if (!email) {
-        statusMsg.textContent = "الرجاء إدخال البريد الإلكتروني أولاً.";
-        statusMsg.style.color = "#ff9ca8";
-        return;
-      }
+<div class="footer">
+هل لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+</div>
 
-      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-      emailVerified = false;
+</div>
 
-      statusMsg.textContent = "تم إرسال كود التحقق بنجاح. الكود التجريبي: " + generatedCode;
-      statusMsg.style.color = "#77d3ff";
+<script>
 
-      // هنا مكان الربط مع API حقيقي لإرسال الكود للإيميل
-      // مثال:
-      // fetch('/send-verification-code', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email: email, code: generatedCode })
-      // });
-    }
+let generatedCode="";
+let verified=false;
+let time=60;
+let timer;
 
-    function verifyEmailCode() {
-      const code = document.getElementById("verificationCode").value.trim();
-      const statusMsg = document.getElementById("statusMsg");
+function sendCode(){
 
-      if (!code) {
-        statusMsg.textContent = "الرجاء إدخال كود التحقق.";
-        statusMsg.style.color = "#ff9ca8";
-        return;
-      }
+const email=document.getElementById("email").value;
+const msg=document.getElementById("statusMsg");
 
-      if (code === generatedCode && generatedCode !== "") {
-        emailVerified = true;
-        statusMsg.textContent = "تم التحقق من البريد الإلكتروني بنجاح.";
-        statusMsg.style.color = "#59f0a9";
-      } else {
-        emailVerified = false;
-        statusMsg.textContent = "كود التحقق غير صحيح.";
-        statusMsg.style.color = "#ff9ca8";
-      }
-    }
+if(email===""){
+msg.innerText="أدخل البريد الإلكتروني أولاً";
+msg.style.color="#ff8080";
+return;
+}
 
-    document.getElementById("registerForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+generatedCode=Math.floor(100000+Math.random()*900000).toString();
 
-      const fullname = document.getElementById("fullname").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const confirmPassword = document.getElementById("confirmPassword").value.trim();
-      const referralCode = document.getElementById("referralCode").value.trim();
-      const statusMsg = document.getElementById("statusMsg");
+msg.style.color="#7ed8ff";
 
-      if (!fullname || !email || !password || !confirmPassword) {
-        statusMsg.textContent = "الرجاء تعبئة جميع الحقول المطلوبة.";
-        statusMsg.style.color = "#ff9ca8";
-        return;
-      }
+time=60;
 
-      if (!emailVerified) {
-        statusMsg.textContent = "يجب التحقق من البريد الإلكتروني أولاً.";
-        statusMsg.style.color = "#ff9ca8";
-        return;
-      }
+clearInterval(timer);
 
-      if (password !== confirmPassword) {
-        statusMsg.textContent = "كلمة المرور وتأكيد كلمة المرور غير متطابقين.";
-        statusMsg.style.color = "#ff9ca8";
-        return;
-      }
+timer=setInterval(function(){
 
-      statusMsg.textContent = "تم إنشاء الحساب بنجاح.";
-      statusMsg.style.color = "#59f0a9";
+msg.innerText="تم إرسال كود التحقق ("+time+" ثانية)";
 
-      // هنا تقدر تربط التسجيل الحقيقي بالسيرفر
-      // fetch('/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     fullname: fullname,
-      //     email: email,
-      //     password: password,
-      //     referral_code: referralCode
-      //   })
-      // });
-    });
-  </script>
+time--;
+
+if(time<0){
+
+clearInterval(timer);
+msg.innerText="يمكنك إعادة إرسال الكود الآن";
+
+}
+
+},1000);
+
+}
+
+function verifyCode(){
+
+const code=document.getElementById("code").value;
+const msg=document.getElementById("statusMsg");
+
+if(code===generatedCode && generatedCode!==""){
+
+verified=true;
+msg.innerText="تم التحقق من البريد الإلكتروني بنجاح";
+msg.style.color="#6cff9f";
+
+}else{
+
+msg.innerText="كود التحقق غير صحيح";
+msg.style.color="#ff8080";
+
+}
+
+}
+
+</script>
+
 </body>
 </html>
