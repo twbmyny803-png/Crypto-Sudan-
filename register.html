@@ -298,8 +298,12 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
     return;
   }
 
-  msg.innerText = "تم إنشاء الحساب بنجاح";
+  msg.innerText = "تم إنشاء الحساب بنجاح، سيتم تحويلك إلى تسجيل الدخول...";
   msg.style.color = "#6cff9f";
+
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 1200);
 });
 </script>
 
