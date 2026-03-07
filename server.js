@@ -82,3 +82,28 @@ app.post("/login", (req, res) => {
 app.listen(3000, () => {
   console.log("Server started");
 });
+app.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.json({ message: "املأ كل البيانات" });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  codes[email] = code;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Sudan Crypto Verification Code",
+      html: `<h2>Sudan Crypto</h2><p>كود التحقق هو:</p><h1>${code}</h1>`
+    });
+
+    users[email] = { name, password, verified: false };
+    res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
+  } catch (error) {
+    console.log("MAIL ERROR:", error);
+    res.status(500).json({ message: "فشل إرسال الكود" });
+  }
+});
