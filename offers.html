@@ -18,8 +18,26 @@
       padding-bottom:90px;
     }
 
+    .top-bar{
+      padding:18px 16px 6px;
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+    }
+
+    .back-btn{
+      background:#0c1f4a;
+      color:white;
+      padding:10px 16px;
+      border-radius:12px;
+      text-decoration:none;
+      font-size:14px;
+      border:1px solid rgba(81,131,255,.15);
+      display:inline-block;
+    }
+
     .header{
-      padding:24px 18px 16px;
+      padding:10px 18px 16px;
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -217,6 +235,10 @@
 </head>
 <body>
 
+  <div class="top-bar">
+    <a href="dashboard.html" class="back-btn">← الرجوع</a>
+  </div>
+
   <div class="header">
     <div>
       <div class="title">العروض</div>
@@ -370,4 +392,23 @@
             <div class="mini-label">الربح اليومي</div>
           </div>
           <div class="mini-box">
-            <div class="mini-value">180 يوم</
+            <div class="mini-value">180 يوم</div>
+            <div class="mini-label">مدة العرض</div>
+          </div>
+        </div>
+        <button class="offer-btn">اشترك الآن</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="dashboard.html">🏠<p>الرئيسية</p></a>
+    <a href="offers.html" class="active">📢<p>العروض</p></a>
+    <a href="membership.html">⭐<p>العضوية</p></a>
+    <a href="#">📄<p>السجل</p></a>
+    <a href="#">👤<p>حسابي</p></a>
+  </div>
+
+</body>
+          </html>
