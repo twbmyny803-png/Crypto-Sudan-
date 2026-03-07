@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudan Crypto - Forgot Password</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+    body{
+      min-height:100vh;
+      color:#fff;
+      background:
+      radial-gradient(circle at top left, rgba(0,195,255,.18), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(138,43,226,.22), transparent 30%),
+      linear-gradient(135deg,#050816 0%,#0c122b 45%,#060913 100%);
+      display:flex;align-items:center;justify-content:center;padding:24px
+    }
+    .card{
+      width:100%;max-width:430px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:28px;
+      padding:28px;
+      backdrop-filter:blur(18px);
+      box-shadow:0 18px 50px rgba(0,0,0,.35)
+    }
+    h1{
+      font-size:42px;
+      text-align:center;
+      margin-bottom:8px;
+      color:#00d2ff
+    }
+    .sub{
+      text-align:center;
+      color:rgba(255,255,255,.75);
+      margin-bottom:22px;
+      line-height:1.6
+    }
+    .input-group{margin-bottom:14px}
+    .input-group label{
+      display:block;
+      margin-bottom:8px;
+      font-size:13px;
+      color:#dbeafe
+    }
+    .input-group input{
+      width:100%;
+      padding:15px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(8,15,30,.72);
+      color:white;
+      outline:none;
+      font-size:15px
+    }
+    .btn{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:16px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(90deg,#00c3ff,#7c3aed);
+      color:#fff;
+      margin-top:8px
+    }
+    .link{
+      display:block;
+      text-align:center;
+      margin-top:16px;
+      color:#7dd3fc;
+      text-decoration:none
+    }
+    .note{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.72);
+      font-size:12px;
+      line-height:1.7
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sudan Crypto</h1>
+    <div class="sub">Reset your demo password</div>
+
+    <div class="input-group">
+      <label>Email Address</label>
+      <input type="email" placeholder="Enter your email">
+    </div>
+
+    <button class="btn">Send Reset Link</button>
+
+    <a class="link" href="index.html">Back to Login</a>
+
+    <div class="note">
+      Demo reset page only. No real emails are sent from this interface.
+    </div>
+  </div>
+</body>
+</html>
