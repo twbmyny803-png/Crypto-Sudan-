@@ -13,9 +13,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "register.html"));
 });
 
-/* =========================
-   الاتصال بقاعدة البيانات
-========================= */
+/* الاتصال بقاعدة البيانات */
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -43,15 +41,11 @@ async function createTable() {
 
 createTable();
 
-/* =========================
-   تخزين أكواد التحقق مؤقت
-========================= */
+/* تخزين أكواد التحقق */
 
 let codes = {};
 
-/* =========================
-   إعداد إرسال الإيميل
-========================= */
+/* إعداد إرسال الإيميل */
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -61,11 +55,21 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-/* =========================
-   تسجيل حساب
-========================= */
+/* عدد الحسابات */
+
+app.get("/users-count", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT COUNT(*) FROM users");
+    res.json({ count: Number(result.rows[0].count) });
+  } catch (error) {
+    res.json({ count: 0 });
+  }
+});
+
+/* تسجيل حساب */
 
 app.post("/register", async (req, res) => {
+
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -73,10 +77,21 @@ app.post("/register", async (req, res) => {
   }
 
   const cleanEmail = email.trim().toLowerCase();
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  codes[cleanEmail] = code;
 
   try {
+
+    const existing = await pool.query(
+      "SELECT id FROM users WHERE email=$1",
+      [cleanEmail]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.json({ message: "هذا البريد الإلكتروني مسجل بالفعل" });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    codes[cleanEmail] = code;
+
     await transporter.sendMail({
       from: "Sudan Crypto <twbmyny803@gmail.com>",
       to: cleanEmail,
@@ -85,15 +100,7 @@ app.post("/register", async (req, res) => {
     });
 
     await pool.query(
-      `
-      INSERT INTO users (name, email, password, verified)
-      VALUES ($1, $2, $3, false)
-      ON CONFLICT (email)
-      DO UPDATE SET
-        name = EXCLUDED.name,
-        password = EXCLUDED.password,
-        verified = false
-      `,
+      "INSERT INTO users (name,email,password,verified) VALUES ($1,$2,$3,false)",
       [name, cleanEmail, password]
     );
 
@@ -103,11 +110,10 @@ app.post("/register", async (req, res) => {
     console.log("REGISTER ERROR:", error);
     res.json({ message: "فشل إنشاء الحساب" });
   }
+
 });
 
-/* =========================
-   التحقق من الكود
-========================= */
+/* التحقق من الكود */
 
 app.post("/verify", async (req, res) => {
 
@@ -118,52 +124,43 @@ app.post("/verify", async (req, res) => {
     return res.json({ message: "الكود غير صحيح" });
   }
 
-  try {
+  await pool.query(
+    "UPDATE users SET verified=true WHERE email=$1",
+    [cleanEmail]
+  );
 
-    await pool.query(
-      "UPDATE users SET verified = true WHERE email = $1",
-      [cleanEmail]
-    );
+  delete codes[cleanEmail];
 
-    res.json({ message: "تم التحقق من البريد بنجاح" });
-
-  } catch (error) {
-
-    console.log("VERIFY ERROR:", error);
-    res.json({ message: "فشل التحقق من البريد" });
-
-  }
+  res.json({ message: "تم التحقق من البريد بنجاح" });
 
 });
 
-/* =========================
-   إرسال كود تسجيل الدخول
-========================= */
+/* إرسال كود تسجيل الدخول */
 
 app.post("/send-login-code", async (req, res) => {
 
   const { email } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
+    [cleanEmail]
+  );
+
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.json({ message: "الحساب غير موجود" });
+  }
+
+  if (!user.verified) {
+    return res.json({ message: "يجب التحقق من البريد أولاً" });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  codes[cleanEmail] = code;
+
   try {
-
-    const result = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [cleanEmail]
-    );
-
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.json({ message: "الحساب غير موجود" });
-    }
-
-    if (!user.verified) {
-      return res.json({ message: "يجب التحقق من البريد أولاً" });
-    }
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    codes[cleanEmail] = code;
 
     await transporter.sendMail({
       from: "Sudan Crypto <twbmyny803@gmail.com>",
@@ -176,61 +173,49 @@ app.post("/send-login-code", async (req, res) => {
 
   } catch (error) {
 
-    console.log("SEND LOGIN CODE ERROR:", error);
     res.json({ message: "فشل إرسال الكود" });
 
   }
 
 });
 
-/* =========================
-   تسجيل الدخول
-========================= */
+/* تسجيل الدخول */
 
 app.post("/login", async (req, res) => {
 
   const { email, password, code } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
-  try {
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
+    [cleanEmail]
+  );
 
-    const result = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [cleanEmail]
-    );
+  const user = result.rows[0];
 
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.json({ message: "الحساب غير موجود" });
-    }
-
-    if (!user.verified) {
-      return res.json({ message: "يجب التحقق من البريد أولاً" });
-    }
-
-    if (user.password !== password) {
-      return res.json({ message: "كلمة المرور غير صحيحة" });
-    }
-
-    if (codes[cleanEmail] != code) {
-      return res.json({ message: "كود التحقق غير صحيح" });
-    }
-
-    res.json({ message: "تم تسجيل الدخول بنجاح" });
-
-  } catch (error) {
-
-    console.log("LOGIN ERROR:", error);
-    res.json({ message: "فشل تسجيل الدخول" });
-
+  if (!user) {
+    return res.json({ message: "الحساب غير موجود" });
   }
+
+  if (!user.verified) {
+    return res.json({ message: "يجب التحقق من البريد أولاً" });
+  }
+
+  if (user.password !== password) {
+    return res.json({ message: "كلمة المرور غير صحيحة" });
+  }
+
+  if (codes[cleanEmail] != code) {
+    return res.json({ message: "كود التحقق غير صحيح" });
+  }
+
+  delete codes[cleanEmail];
+
+  res.json({ message: "تم تسجيل الدخول بنجاح" });
 
 });
 
-/* =========================
-   تشغيل السيرفر
-========================= */
+/* تشغيل السيرفر */
 
 app.listen(PORT, () => {
   console.log("Server started on port " + PORT);
