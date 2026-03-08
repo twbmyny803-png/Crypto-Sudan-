@@ -367,6 +367,37 @@ body{
   line-height:1.8;
 }
 
+.verify-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:110px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.verify-pending{
+  background:rgba(255, 193, 7, 0.18);
+  color:#ffd54f;
+}
+
+.verify-approved{
+  background:rgba(76, 175, 80, 0.18);
+  color:#7dffb0;
+}
+
+.verify-rejected{
+  background:rgba(244, 67, 54, 0.18);
+  color:#ff8f8f;
+}
+
+.verify-default{
+  background:rgba(255,255,255,0.12);
+  color:#dce8ff;
+}
+
 @media (max-width: 520px){
   .info-grid{
     grid-template-columns:1fr;
@@ -404,7 +435,9 @@ body{
 
     <div class="info-box">
       <div class="info-label">حالة التوثيق</div>
-      <div class="info-value" id="verifyStatus">غير موثق</div>
+      <div class="info-value" id="verifyStatusWrap">
+        <span class="verify-badge verify-default" id="verifyStatus">غير موثق</span>
+      </div>
     </div>
 
     <div class="info-box">
@@ -434,7 +467,7 @@ body{
       <span>‹</span>
     </button>
 
-    <button class="menu-btn">
+    <button class="menu-btn" onclick="goToVerificationPage()">
       <div class="left">
         <div class="menu-icon">🪪</div>
         <span>توثيق الحساب</span>
@@ -496,7 +529,6 @@ body{
   </a>
 </div>
 
-<!-- نافذة كلمة مرور السحب -->
 <div class="modal" id="withdrawPasswordModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -593,6 +625,22 @@ function showWithdrawForm(type) {
   showStatus("", "#ffffff");
 }
 
+function setVerificationBadge(statusText) {
+  const badge = document.getElementById("verifyStatus");
+  badge.textContent = statusText || "غير موثق";
+  badge.className = "verify-badge";
+
+  if (statusText === "قيد المراجعة") {
+    badge.classList.add("verify-pending");
+  } else if (statusText === "موثق") {
+    badge.classList.add("verify-approved");
+  } else if (statusText === "مرفوض") {
+    badge.classList.add("verify-rejected");
+  } else {
+    badge.classList.add("verify-default");
+  }
+}
+
 function showStatus(text, color) {
   const box = document.getElementById("withdrawPasswordStatus");
   box.innerText = text;
@@ -605,6 +653,10 @@ function logoutUser() {
   window.location.href = "login.html";
 }
 
+function goToVerificationPage() {
+  window.location.href = "verify.html";
+}
+
 async function loadUserData() {
   const savedEmail = localStorage.getItem("loggedInEmail") || "";
   const savedName = localStorage.getItem("loggedInName") || "اسم المستخدم";
@@ -613,6 +665,7 @@ async function loadUserData() {
     document.getElementById("fullName").innerText = savedName;
     document.getElementById("userEmail").innerText = "يجب تسجيل الدخول أولاً";
     document.getElementById("avatarLetter").innerText = "U";
+    setVerificationBadge("غير موثق");
     return;
   }
 
@@ -623,6 +676,7 @@ async function loadUserData() {
     if (data.message) {
       document.getElementById("fullName").innerText = savedName;
       document.getElementById("userEmail").innerText = savedEmail;
+      setVerificationBadge("غير موثق");
       return;
     }
 
@@ -630,8 +684,9 @@ async function loadUserData() {
     document.getElementById("userEmail").innerText = data.email || savedEmail;
     document.getElementById("fullName").innerText = realName;
     document.getElementById("vipStatus").innerText = data.vip_status || "VIP0";
-    document.getElementById("verifyStatus").innerText = data.verification_status || "غير موثق";
     document.getElementById("accountBalance").innerText = (data.balance || 0) + " $";
+
+    setVerificationBadge(data.verification_status || "غير موثق");
 
     const firstLetter = realName.trim() ? realName.trim().charAt(0).toUpperCase() : "U";
     document.getElementById("avatarLetter").innerText = firstLetter;
@@ -642,6 +697,7 @@ async function loadUserData() {
     console.log(error);
     document.getElementById("fullName").innerText = savedName;
     document.getElementById("userEmail").innerText = savedEmail;
+    setVerificationBadge("غير موثق");
   }
 }
 
@@ -812,4 +868,4 @@ loadUserData();
 </script>
 
 </body>
-                            </html>
+</html>
