@@ -56,8 +56,8 @@ let codes = {};
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: "twbmyny803@gmail.com",
+    pass: "oyiivkrudpiejjbd"
   }
 });
 
@@ -78,7 +78,7 @@ app.post("/register", async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: "Sudan Crypto <twbmyny803@gmail.com>",
       to: cleanEmail,
       subject: "Sudan Crypto Verification Code",
       html: `<h2>Sudan Crypto</h2><p>كود التحقق:</p><h1>${code}</h1>`
@@ -98,6 +98,7 @@ app.post("/register", async (req, res) => {
     );
 
     res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
+
   } catch (error) {
     console.log("REGISTER ERROR:", error);
     res.json({ message: "فشل إنشاء الحساب" });
@@ -109,6 +110,7 @@ app.post("/register", async (req, res) => {
 ========================= */
 
 app.post("/verify", async (req, res) => {
+
   const { email, code } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
@@ -117,16 +119,21 @@ app.post("/verify", async (req, res) => {
   }
 
   try {
+
     await pool.query(
       "UPDATE users SET verified = true WHERE email = $1",
       [cleanEmail]
     );
 
     res.json({ message: "تم التحقق من البريد بنجاح" });
+
   } catch (error) {
+
     console.log("VERIFY ERROR:", error);
     res.json({ message: "فشل التحقق من البريد" });
+
   }
+
 });
 
 /* =========================
@@ -134,10 +141,12 @@ app.post("/verify", async (req, res) => {
 ========================= */
 
 app.post("/send-login-code", async (req, res) => {
+
   const { email } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
   try {
+
     const result = await pool.query(
       "SELECT * FROM users WHERE email = $1",
       [cleanEmail]
@@ -157,17 +166,21 @@ app.post("/send-login-code", async (req, res) => {
     codes[cleanEmail] = code;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: "Sudan Crypto <twbmyny803@gmail.com>",
       to: cleanEmail,
       subject: "Sudan Crypto Login Code",
       html: `<h2>Sudan Crypto</h2><p>كود تسجيل الدخول:</p><h1>${code}</h1>`
     });
 
     res.json({ message: "تم إرسال كود تسجيل الدخول إلى بريدك" });
+
   } catch (error) {
+
     console.log("SEND LOGIN CODE ERROR:", error);
     res.json({ message: "فشل إرسال الكود" });
+
   }
+
 });
 
 /* =========================
@@ -175,10 +188,12 @@ app.post("/send-login-code", async (req, res) => {
 ========================= */
 
 app.post("/login", async (req, res) => {
+
   const { email, password, code } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
   try {
+
     const result = await pool.query(
       "SELECT * FROM users WHERE email = $1",
       [cleanEmail]
@@ -203,10 +218,14 @@ app.post("/login", async (req, res) => {
     }
 
     res.json({ message: "تم تسجيل الدخول بنجاح" });
+
   } catch (error) {
+
     console.log("LOGIN ERROR:", error);
     res.json({ message: "فشل تسجيل الدخول" });
+
   }
+
 });
 
 /* =========================
