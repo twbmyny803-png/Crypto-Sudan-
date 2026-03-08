@@ -82,6 +82,7 @@ display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
+cursor:pointer;
 }
 
 .menu-item img{
@@ -158,9 +159,153 @@ color:#1cc4ff;
 font-weight:bold;
 }
 
+.referral-modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.65);
+display:none;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:1000;
+}
+
+.referral-modal.active{
+display:flex;
+}
+
+.referral-box{
+width:100%;
+max-width:520px;
+background:#0b1535;
+border-radius:24px;
+padding:20px;
+box-shadow:0 20px 50px rgba(0,0,0,0.5);
+max-height:90vh;
+overflow:auto;
+}
+
+.referral-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.referral-title{
+font-size:22px;
+color:#1cc4ff;
+font-weight:bold;
+}
+
+.close-btn{
+background:#16305f;
+border:none;
+color:white;
+width:38px;
+height:38px;
+border-radius:10px;
+cursor:pointer;
+font-size:18px;
+}
+
+.info-card{
+background:#091632;
+border-radius:16px;
+padding:14px;
+margin-bottom:12px;
+}
+
+.info-label{
+font-size:13px;
+color:#9fb0d3;
+margin-bottom:6px;
+}
+
+.info-value{
+font-size:16px;
+word-break:break-all;
+color:white;
+font-weight:bold;
+}
+
+.action-row{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.action-btn{
+flex:1;
+height:42px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+color:white;
+font-size:14px;
+}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+margin-top:10px;
+}
+
+.stat-card{
+background:#091632;
+border-radius:16px;
+padding:12px;
+text-align:center;
+}
+
+.stat-title{
+font-size:13px;
+color:#9fb0d3;
+margin-bottom:6px;
+}
+
+.stat-number{
+font-size:20px;
+font-weight:bold;
+color:#1cc4ff;
+}
+
+.earnings-box{
+background:linear-gradient(90deg,#12315f,#192c6c);
+border-radius:16px;
+padding:14px;
+text-align:center;
+margin-bottom:12px;
+}
+
+.earnings-title{
+font-size:14px;
+color:#cddcff;
+margin-bottom:6px;
+}
+
+.earnings-value{
+font-size:26px;
+font-weight:bold;
+color:#6cff9f;
+}
+
+.referral-status{
+margin-top:10px;
+font-size:14px;
+text-align:center;
+min-height:20px;
+line-height:1.7;
+}
+
 @media (max-width: 520px){
 .menu{
 grid-template-columns:repeat(2,1fr);
+}
+.stats-grid{
+grid-template-columns:1fr;
 }
 }
 </style>
@@ -189,12 +334,12 @@ grid-template-columns:repeat(2,1fr);
 
 <div class="menu">
 
-  <a href="#" class="menu-link">
+  <div class="menu-link" onclick="openReferralBox()">
     <div class="menu-item">
       <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">
       <p>دعوة صديق</p>
     </div>
-  </a>
+  </div>
 
   <a href="membership.html" class="menu-link">
     <div class="menu-item">
@@ -266,5 +411,177 @@ grid-template-columns:repeat(2,1fr);
 
 </div>
 
+<!-- نافذة دعوة صديق -->
+<div class="referral-modal" id="referralModal">
+  <div class="referral-box">
+    <div class="referral-header">
+      <div class="referral-title">دعوة صديق</div>
+      <button class="close-btn" onclick="closeReferralBox()">✕</button>
+    </div>
+
+    <div class="earnings-box">
+      <div class="earnings-title">إجمالي أرباح الإحالة</div>
+      <div class="earnings-value" id="referralEarnings">0 $</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-label">كود الإحالة الخاص بك</div>
+      <div class="info-value" id="referralCodeValue">...</div>
+      <div class="action-row">
+        <button class="action-btn" onclick="copyReferralCode()">نسخ الكود</button>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-label">رابط الدعوة الخاص بك</div>
+      <div class="info-value" id="referralLinkValue">...</div>
+      <div class="action-row">
+        <button class="action-btn" onclick="copyReferralLink()">نسخ الرابط</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">المستوى الأول - المدعوين</div>
+        <div class="stat-number" id="l1Total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">المستوى الأول - المودعين</div>
+        <div class="stat-number" id="l1Deposited">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">المستوى الثاني - المدعوين</div>
+        <div class="stat-number" id="l2Total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">المستوى الثاني - المودعين</div>
+        <div class="stat-number" id="l2Deposited">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">المستوى الثالث - المدعوين</div>
+        <div class="stat-number" id="l3Total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">المستوى الثالث - المودعين</div>
+        <div class="stat-number" id="l3Deposited">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">المستوى الرابع - المدعوين</div>
+        <div class="stat-number" id="l4Total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">المستوى الرابع - المودعين</div>
+        <div class="stat-number" id="l4Deposited">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">المستوى الخامس - المدعوين</div>
+        <div class="stat-number" id="l5Total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">المستوى الخامس - المودعين</div>
+        <div class="stat-number" id="l5Deposited">0</div>
+      </div>
+    </div>
+
+    <div class="referral-status" id="referralStatus"></div>
+  </div>
+</div>
+
+<script>
+let currentReferralCode = "";
+let currentReferralLink = "";
+
+function showReferralStatus(text, color) {
+  const box = document.getElementById("referralStatus");
+  box.innerText = text;
+  box.style.color = color;
+}
+
+async function openReferralBox() {
+  document.getElementById("referralModal").classList.add("active");
+
+  const email = localStorage.getItem("loggedInEmail");
+
+  if (!email) {
+    showReferralStatus("لم يتم العثور على حسابك المسجل. سجل الدخول مرة أخرى.", "#ff8080");
+    return;
+  }
+
+  showReferralStatus("جاري تحميل بيانات الإحالة...", "#7ed8ff");
+
+  try {
+    const res = await fetch("/my-referral-info?email=" + encodeURIComponent(email));
+    const data = await res.json();
+
+    if (data.message) {
+      showReferralStatus(data.message, "#ff8080");
+      return;
+    }
+
+    currentReferralCode = data.referral_code || "";
+    currentReferralLink = data.referral_link || "";
+
+    document.getElementById("referralCodeValue").innerText = currentReferralCode || "...";
+    document.getElementById("referralLinkValue").innerText = currentReferralLink || "...";
+    document.getElementById("referralEarnings").innerText = (data.referral_earnings || 0) + " $";
+
+    document.getElementById("l1Total").innerText = data.levels.level1.total_referrals;
+    document.getElementById("l1Deposited").innerText = data.levels.level1.deposited_referrals;
+
+    document.getElementById("l2Total").innerText = data.levels.level2.total_referrals;
+    document.getElementById("l2Deposited").innerText = data.levels.level2.deposited_referrals;
+
+    document.getElementById("l3Total").innerText = data.levels.level3.total_referrals;
+    document.getElementById("l3Deposited").innerText = data.levels.level3.deposited_referrals;
+
+    document.getElementById("l4Total").innerText = data.levels.level4.total_referrals;
+    document.getElementById("l4Deposited").innerText = data.levels.level4.deposited_referrals;
+
+    document.getElementById("l5Total").innerText = data.levels.level5.total_referrals;
+    document.getElementById("l5Deposited").innerText = data.levels.level5.deposited_referrals;
+
+    showReferralStatus("تم تحميل بيانات الإحالة بنجاح", "#6cff9f");
+
+  } catch (error) {
+    console.log(error);
+    showReferralStatus("حصل خطأ أثناء تحميل بيانات الإحالة", "#ff8080");
+  }
+}
+
+function closeReferralBox() {
+  document.getElementById("referralModal").classList.remove("active");
+}
+
+function copyReferralCode() {
+  if (!currentReferralCode) return;
+
+  navigator.clipboard.writeText(currentReferralCode).then(() => {
+    showReferralStatus("تم نسخ كود الإحالة", "#6cff9f");
+  }).catch(() => {
+    showReferralStatus("تعذر نسخ كود الإحالة", "#ff8080");
+  });
+}
+
+function copyReferralLink() {
+  if (!currentReferralLink) return;
+
+  navigator.clipboard.writeText(currentReferralLink).then(() => {
+    showReferralStatus("تم نسخ رابط الإحالة", "#6cff9f");
+  }).catch(() => {
+    showReferralStatus("تعذر نسخ رابط الإحالة", "#ff8080");
+  });
+}
+
+document.getElementById("referralModal").addEventListener("click", function(e) {
+  if (e.target.id === "referralModal") {
+    closeReferralBox();
+  }
+});
+</script>
+
 </body>
-</html>
+  </html>
