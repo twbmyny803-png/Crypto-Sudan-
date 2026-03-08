@@ -9,11 +9,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 /* تجهيز مجلدات رفع الملفات */
 const uploadBaseDir = path.join(__dirname, "uploads");
 const verificationDir = path.join(uploadBaseDir, "verification");
+const depositReceiptsDir = path.join(uploadBaseDir, "deposit-receipts");
 
 if (!fs.existsSync(uploadBaseDir)) {
   fs.mkdirSync(uploadBaseDir, { recursive: true });
@@ -23,21 +25,14 @@ if (!fs.existsSync(verificationDir)) {
   fs.mkdirSync(verificationDir, { recursive: true });
 }
 
+if (!fs.existsSync(depositReceiptsDir)) {
+  fs.mkdirSync(depositReceiptsDir, { recursive: true });
+}
+
 app.use("/uploads", express.static(uploadBaseDir));
 
-/* إعداد رفع الصور */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, verificationDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
-    const safeName = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
-    cb(null, safeName);
-  }
-});
-
-function fileFilter(req, file, cb) {
+/* إعدادات مشتركة لرفع الملفات */
+function commonFileFilter(req, file, cb) {
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
   if (!allowedTypes.includes(file.mimetype)) {
     return cb(new Error("نوع الملف غير مدعوم، ارفع صورة فقط"));
@@ -45,12 +40,38 @@ function fileFilter(req, file, cb) {
   cb(null, true);
 }
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024
+const verificationStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, verificationDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
+    const safeName = "verify-" + Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, safeName);
   }
+});
+
+const depositStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, depositReceiptsDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
+    const safeName = "deposit-" + Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, safeName);
+  }
+});
+
+const verificationUpload = multer({
+  storage: verificationStorage,
+  fileFilter: commonFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+const depositUpload = multer({
+  storage: depositStorage,
+  fileFilter: commonFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 
 /* الصفحة الرئيسية تفتح تسجيل الدخول */
@@ -73,6 +94,10 @@ app.get("/forgot", (req, res) => {
 
 app.get("/verify-identity", (req, res) => {
   res.sendFile(path.join(__dirname, "verify.html"));
+});
+
+app.get("/deposit", (req, res) => {
+  res.sendFile(path.join(__dirname, "deposit.html"));
 });
 
 /* الاتصال بقاعدة البيانات */
@@ -132,7 +157,28 @@ async function createUniqueReferralCode() {
   }
 }
 
-async function ensureReferralColumns() {
+function generateDepositRequestId() {
+  return "DEP-" + Date.now() + "-" + Math.floor(1000 + Math.random() * 9000);
+}
+
+async function createUniqueDepositRequestId() {
+  let requestId = generateDepositRequestId();
+
+  while (true) {
+    const result = await pool.query(
+      "SELECT id FROM deposit_requests WHERE request_id = $1",
+      [requestId]
+    );
+
+    if (result.rows.length === 0) {
+      return requestId;
+    }
+
+    requestId = generateDepositRequestId();
+  }
+}
+
+async function ensureUserColumns() {
   try {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by TEXT`);
@@ -161,9 +207,38 @@ async function ensureReferralColumns() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_passport_image TEXT`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_submitted_at TEXT`);
 
-    console.log("Referral, account and verification columns ready");
+    console.log("User columns ready");
   } catch (error) {
-    console.log("ALTER TABLE ERROR:", error);
+    console.log("ALTER USERS TABLE ERROR:", error);
+  }
+}
+
+async function ensureDepositTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS deposit_requests (
+        id SERIAL PRIMARY KEY,
+        request_id TEXT UNIQUE,
+        email TEXT NOT NULL,
+        plan_name TEXT,
+        network_code TEXT NOT NULL,
+        network_name TEXT NOT NULL,
+        deposit_address TEXT NOT NULL,
+        amount NUMERIC NOT NULL DEFAULT 0,
+        txid TEXT,
+        receipt_image TEXT,
+        status TEXT DEFAULT 'قيد الدفع',
+        review_note TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT NOW(),
+        expires_at TIMESTAMP,
+        submitted_at TIMESTAMP,
+        reviewed_at TIMESTAMP
+      )
+    `);
+
+    console.log("Deposit requests table ready");
+  } catch (error) {
+    console.log("CREATE DEPOSIT REQUESTS TABLE ERROR:", error);
   }
 }
 
@@ -202,7 +277,8 @@ async function initDatabase() {
 
     console.log("Users table ready");
 
-    await ensureReferralColumns();
+    await ensureUserColumns();
+    await ensureDepositTable();
     await backfillReferralCodes();
   } catch (error) {
     console.log("INIT DATABASE ERROR:", error);
@@ -210,6 +286,61 @@ async function initDatabase() {
 }
 
 initDatabase();
+
+async function expireOldDepositRequests() {
+  try {
+    await pool.query(`
+      UPDATE deposit_requests
+      SET status = 'ملغي', review_note = 'انتهت مدة الطلب', reviewed_at = NOW()
+      WHERE status = 'قيد الدفع' AND expires_at IS NOT NULL AND expires_at < NOW()
+    `);
+  } catch (error) {
+    console.log("EXPIRE DEPOSIT REQUESTS ERROR:", error);
+  }
+}
+
+setInterval(expireOldDepositRequests, 30000);
+
+async function applyFirstDepositBenefits(cleanEmail, depositAmount) {
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email = $1 AND verified = true",
+    [cleanEmail]
+  );
+
+  const user = result.rows[0];
+
+  if (!user) {
+    return;
+  }
+
+  if (user.has_deposited) {
+    return;
+  }
+
+  await pool.query(
+    "UPDATE users SET has_deposited = true, first_deposit_amount = $1 WHERE email = $2",
+    [depositAmount, cleanEmail]
+  );
+
+  const rewardPlan = [
+    { code: user.level_1_referrer, percent: 15 },
+    { code: user.level_2_referrer, percent: 7 },
+    { code: user.level_3_referrer, percent: 4 },
+    { code: user.level_4_referrer, percent: 2 },
+    { code: user.level_5_referrer, percent: 1 }
+  ];
+
+  for (const item of rewardPlan) {
+    if (!item.code) continue;
+
+    const reward = (depositAmount * item.percent) / 100;
+
+    await pool.query(
+      "UPDATE users SET referral_earnings = COALESCE(referral_earnings, 0) + $1 WHERE referral_code = $2",
+      [reward, item.code]
+    );
+  }
+}
 
 /* عدد الحسابات */
 app.get("/users-count", async (req, res) => {
@@ -861,7 +992,7 @@ app.post("/forgot-withdraw-password", async (req, res) => {
 /* إرسال طلب توثيق الهوية */
 app.post(
   "/submit-verification",
-  upload.fields([
+  verificationUpload.fields([
     { name: "frontImage", maxCount: 1 },
     { name: "backImage", maxCount: 1 },
     { name: "passportImage", maxCount: 1 }
@@ -1011,6 +1142,352 @@ app.post("/admin/update-verification-status", async (req, res) => {
   }
 });
 
+/* فتح طلب إيداع جديد */
+app.post("/create-deposit-request", async (req, res) => {
+  const { email, planName, networkCode, networkName, depositAddress, amount } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const cleanPlanName = (planName || "").trim();
+  const cleanNetworkCode = (networkCode || "").trim();
+  const cleanNetworkName = (networkName || "").trim();
+  const cleanDepositAddress = (depositAddress || "").trim();
+  const depositAmount = Number(amount);
+
+  if (!cleanEmail || !cleanNetworkCode || !cleanNetworkName || !cleanDepositAddress || !depositAmount || depositAmount <= 0) {
+    return res.json({ message: "املأ بيانات طلب الإيداع بشكل صحيح" });
+  }
+
+  try {
+    await expireOldDepositRequests();
+
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود أو غير مفعل" });
+    }
+
+    const activeRequestResult = await pool.query(
+      `
+      SELECT * FROM deposit_requests
+      WHERE email = $1 AND status = 'قيد الدفع' AND expires_at > NOW()
+      ORDER BY created_at DESC
+      LIMIT 1
+      `,
+      [cleanEmail]
+    );
+
+    if (activeRequestResult.rows.length > 0) {
+      const activeRequest = activeRequestResult.rows[0];
+      return res.json({
+        message: "لديك طلب إيداع مفتوح بالفعل",
+        request_id: activeRequest.request_id,
+        expires_at: activeRequest.expires_at,
+        status: activeRequest.status
+      });
+    }
+
+    const requestId = await createUniqueDepositRequestId();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await pool.query(
+      `
+      INSERT INTO deposit_requests (
+        request_id,
+        email,
+        plan_name,
+        network_code,
+        network_name,
+        deposit_address,
+        amount,
+        status,
+        created_at,
+        expires_at
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,'قيد الدفع',NOW(),$8)
+      `,
+      [
+        requestId,
+        cleanEmail,
+        cleanPlanName,
+        cleanNetworkCode,
+        cleanNetworkName,
+        cleanDepositAddress,
+        depositAmount,
+        expiresAt
+      ]
+    );
+
+    res.json({
+      message: "تم فتح طلب الإيداع بنجاح",
+      request_id: requestId,
+      status: "قيد الدفع",
+      expires_at: expiresAt
+    });
+  } catch (error) {
+    console.log("CREATE DEPOSIT REQUEST ERROR:", error);
+    res.json({ message: "فشل فتح طلب الإيداع" });
+  }
+});
+
+/* إرسال إثبات الإيداع */
+app.post("/submit-deposit-proof", depositUpload.single("receiptImage"), async (req, res) => {
+  const { email, requestId, txid } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const cleanRequestId = (requestId || "").trim();
+  const cleanTxid = (txid || "").trim();
+
+  if (!cleanEmail || !cleanRequestId || !cleanTxid) {
+    return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (!req.file) {
+    return res.json({ message: "ارفع صورة الإيصال" });
+  }
+
+  try {
+    await expireOldDepositRequests();
+
+    const result = await pool.query(
+      `
+      SELECT * FROM deposit_requests
+      WHERE request_id = $1 AND email = $2
+      `,
+      [cleanRequestId, cleanEmail]
+    );
+
+    const request = result.rows[0];
+
+    if (!request) {
+      return res.json({ message: "طلب الإيداع غير موجود" });
+    }
+
+    if (request.status === "ملغي") {
+      return res.json({ message: "انتهت مدة الطلب وتم إلغاؤه" });
+    }
+
+    if (request.status !== "قيد الدفع") {
+      return res.json({ message: "لا يمكن تعديل هذا الطلب الآن" });
+    }
+
+    const now = new Date();
+    if (request.expires_at && new Date(request.expires_at) < now) {
+      await pool.query(
+        `
+        UPDATE deposit_requests
+        SET status = 'ملغي', review_note = 'انتهت مدة الطلب', reviewed_at = NOW()
+        WHERE request_id = $1
+        `,
+        [cleanRequestId]
+      );
+
+      return res.json({ message: "انتهت مدة الطلب وتم إلغاؤه" });
+    }
+
+    const receiptImagePath = "uploads/deposit-receipts/" + req.file.filename;
+
+    await pool.query(
+      `
+      UPDATE deposit_requests
+      SET
+        txid = $1,
+        receipt_image = $2,
+        status = 'قيد المراجعة',
+        submitted_at = NOW()
+      WHERE request_id = $3
+      `,
+      [cleanTxid, receiptImagePath, cleanRequestId]
+    );
+
+    res.json({ message: "تم إرسال إثبات الإيداع بنجاح وهو الآن قيد المراجعة" });
+  } catch (error) {
+    console.log("SUBMIT DEPOSIT PROOF ERROR:", error);
+    res.json({ message: "فشل إرسال إثبات الإيداع" });
+  }
+});
+
+/* إلغاء طلب الإيداع */
+app.post("/cancel-deposit-request", async (req, res) => {
+  const { email, requestId } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const cleanRequestId = (requestId || "").trim();
+
+  if (!cleanEmail || !cleanRequestId) {
+    return res.json({ message: "أدخل البريد ورقم الطلب" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM deposit_requests WHERE request_id = $1 AND email = $2",
+      [cleanRequestId, cleanEmail]
+    );
+
+    const request = result.rows[0];
+
+    if (!request) {
+      return res.json({ message: "طلب الإيداع غير موجود" });
+    }
+
+    if (request.status === "ناجح" || request.status === "مرفوض") {
+      return res.json({ message: "لا يمكن إلغاء هذا الطلب" });
+    }
+
+    await pool.query(
+      `
+      UPDATE deposit_requests
+      SET status = 'ملغي', review_note = 'تم إلغاء الطلب بواسطة المستخدم', reviewed_at = NOW()
+      WHERE request_id = $1
+      `,
+      [cleanRequestId]
+    );
+
+    res.json({ message: "تم إلغاء طلب الإيداع" });
+  } catch (error) {
+    console.log("CANCEL DEPOSIT REQUEST ERROR:", error);
+    res.json({ message: "فشل إلغاء طلب الإيداع" });
+  }
+});
+
+/* جلب طلبات الإيداع للمستخدم */
+app.get("/my-deposit-requests", async (req, res) => {
+  const cleanEmail = ((req.query.email || "") + "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    await expireOldDepositRequests();
+
+    const result = await pool.query(
+      `
+      SELECT
+        request_id,
+        plan_name,
+        network_code,
+        network_name,
+        deposit_address,
+        amount,
+        txid,
+        receipt_image,
+        status,
+        review_note,
+        created_at,
+        expires_at,
+        submitted_at,
+        reviewed_at
+      FROM deposit_requests
+      WHERE email = $1
+      ORDER BY created_at DESC
+      `,
+      [cleanEmail]
+    );
+
+    res.json({
+      deposits: result.rows.map((row) => ({
+        request_id: row.request_id,
+        plan_name: row.plan_name || "",
+        network_code: row.network_code || "",
+        network_name: row.network_name || "",
+        deposit_address: row.deposit_address || "",
+        amount: Number(row.amount || 0),
+        txid: row.txid || "",
+        receipt_image: row.receipt_image || "",
+        status: row.status || "",
+        review_note: row.review_note || "",
+        created_at: row.created_at,
+        expires_at: row.expires_at,
+        submitted_at: row.submitted_at,
+        reviewed_at: row.reviewed_at
+      }))
+    });
+  } catch (error) {
+    console.log("MY DEPOSIT REQUESTS ERROR:", error);
+    res.json({ message: "فشل جلب طلبات الإيداع" });
+  }
+});
+
+/* تحديث حالة الإيداع من الإدارة */
+app.post("/admin/update-deposit-status", async (req, res) => {
+  const { requestId, status, note } = req.body;
+  const cleanRequestId = (requestId || "").trim();
+  const cleanStatus = (status || "").trim();
+  const cleanNote = (note || "").trim();
+
+  if (!cleanRequestId || !cleanStatus) {
+    return res.json({ message: "أدخل رقم الطلب والحالة" });
+  }
+
+  if (!["ناجح", "مرفوض", "قيد المراجعة", "ملغي"].includes(cleanStatus)) {
+    return res.json({ message: "حالة غير صحيحة" });
+  }
+
+  try {
+    await expireOldDepositRequests();
+
+    const result = await pool.query(
+      "SELECT * FROM deposit_requests WHERE request_id = $1",
+      [cleanRequestId]
+    );
+
+    const request = result.rows[0];
+
+    if (!request) {
+      return res.json({ message: "طلب الإيداع غير موجود" });
+    }
+
+    if (cleanStatus === "ناجح") {
+      if (request.status === "ناجح") {
+        return res.json({ message: "هذا الطلب معتمد بالفعل" });
+      }
+
+      await pool.query("BEGIN");
+
+      await pool.query(
+        `
+        UPDATE deposit_requests
+        SET status = 'ناجح', review_note = $1, reviewed_at = NOW()
+        WHERE request_id = $2
+        `,
+        [cleanNote, cleanRequestId]
+      );
+
+      await pool.query(
+        "UPDATE users SET balance = COALESCE(balance, 0) + $1 WHERE email = $2",
+        [Number(request.amount || 0), request.email]
+      );
+
+      await applyFirstDepositBenefits(request.email, Number(request.amount || 0));
+
+      await pool.query("COMMIT");
+
+      return res.json({ message: "تم اعتماد الإيداع وإضافة الرصيد بنجاح" });
+    }
+
+    await pool.query(
+      `
+      UPDATE deposit_requests
+      SET status = $1, review_note = $2, reviewed_at = NOW()
+      WHERE request_id = $3
+      `,
+      [cleanStatus, cleanNote, cleanRequestId]
+    );
+
+    res.json({ message: "تم تحديث حالة طلب الإيداع بنجاح" });
+  } catch (error) {
+    try {
+      await pool.query("ROLLBACK");
+    } catch (rollbackError) {
+      console.log("ROLLBACK ERROR:", rollbackError);
+    }
+    console.log("ADMIN UPDATE DEPOSIT STATUS ERROR:", error);
+    res.json({ message: "فشل تحديث حالة الإيداع" });
+  }
+});
+
 /* تعليم المستخدم كمودع لأول مرة + توزيع مكافآت الإحالة */
 app.post("/mark-deposit", async (req, res) => {
   const { email, amount } = req.body;
@@ -1037,29 +1514,7 @@ app.post("/mark-deposit", async (req, res) => {
       return res.json({ message: "تم احتساب أول إيداع لهذا الحساب مسبقاً" });
     }
 
-    await pool.query(
-      "UPDATE users SET has_deposited = true, first_deposit_amount = $1 WHERE email = $2",
-      [depositAmount, cleanEmail]
-    );
-
-    const rewardPlan = [
-      { code: user.level_1_referrer, percent: 15 },
-      { code: user.level_2_referrer, percent: 7 },
-      { code: user.level_3_referrer, percent: 4 },
-      { code: user.level_4_referrer, percent: 2 },
-      { code: user.level_5_referrer, percent: 1 }
-    ];
-
-    for (const item of rewardPlan) {
-      if (!item.code) continue;
-
-      const reward = (depositAmount * item.percent) / 100;
-
-      await pool.query(
-        "UPDATE users SET referral_earnings = COALESCE(referral_earnings, 0) + $1 WHERE referral_code = $2",
-        [reward, item.code]
-      );
-    }
+    await applyFirstDepositBenefits(cleanEmail, depositAmount);
 
     res.json({ message: "تم تسجيل أول إيداع وتوزيع مكافآت الإحالة بنجاح" });
   } catch (error) {
