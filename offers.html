@@ -296,7 +296,7 @@
             <div class="mini-label">مدة العرض</div>
           </div>
         </div>
-        <button class="offer-btn">اشترك الآن</button>
+        <button class="offer-btn" onclick="goToDeposit(30, 'عرض البداية')">اشترك الآن</button>
       </div>
 
       <div class="offer-card">
@@ -321,7 +321,7 @@
             <div class="mini-label">مدة العرض</div>
           </div>
         </div>
-        <button class="offer-btn">اشترك الآن</button>
+        <button class="offer-btn" onclick="goToDeposit(50, 'عرض النجمتين')">اشترك الآن</button>
       </div>
 
       <div class="offer-card">
@@ -346,7 +346,7 @@
             <div class="mini-label">مدة العرض</div>
           </div>
         </div>
-        <button class="offer-btn">اشترك الآن</button>
+        <button class="offer-btn" onclick="goToDeposit(90, 'عرض الثلاث نجوم')">اشترك الآن</button>
       </div>
 
       <div class="offer-card">
@@ -371,7 +371,7 @@
             <div class="mini-label">مدة العرض</div>
           </div>
         </div>
-        <button class="offer-btn">اشترك الآن</button>
+        <button class="offer-btn" onclick="goToDeposit(120, 'عرض الأربعة نجوم')">اشترك الآن</button>
       </div>
 
       <div class="offer-card">
@@ -396,7 +396,7 @@
             <div class="mini-label">مدة العرض</div>
           </div>
         </div>
-        <button class="offer-btn">اشترك الآن</button>
+        <button class="offer-btn" onclick="goToDeposit(200, 'عرض الخمس نجوم')">اشترك الآن</button>
       </div>
 
     </div>
@@ -406,9 +406,15 @@
     <a href="dashboard.html">🏠<p>الرئيسية</p></a>
     <a href="offers.html" class="active">📢<p>العروض</p></a>
     <a href="membership.html">⭐<p>العضوية</p></a>
-    <a href="#">📄<p>السجل</p></a>
-    <a href="#">👤<p>حسابي</p></a>
+    <a href="account.html">👤<p>حسابي</p></a>
   </div>
 
+  <script>
+    function goToDeposit(amount, offerName) {
+      const url = "deposit.html?amount=" + encodeURIComponent(amount) + "&plan=" + encodeURIComponent(offerName);
+      window.location.href = url;
+    }
+  </script>
+
 </body>
-          </html>
+            </html>
