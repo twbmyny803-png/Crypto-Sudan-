@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudan Crypto - Forgot Password</title>
+  <title>Sudan Crypto - إعادة تعيين كلمة المرور</title>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Tahoma, Arial, sans-serif;
+    }
+
     body{
       min-height:100vh;
       color:#fff;
@@ -13,36 +19,50 @@
       radial-gradient(circle at top left, rgba(0,195,255,.18), transparent 28%),
       radial-gradient(circle at bottom right, rgba(138,43,226,.22), transparent 30%),
       linear-gradient(135deg,#050816 0%,#0c122b 45%,#060913 100%);
-      display:flex;align-items:center;justify-content:center;padding:24px
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
+
     .card{
-      width:100%;max-width:430px;
+      width:100%;
+      max-width:430px;
       background:rgba(255,255,255,.07);
       border:1px solid rgba(255,255,255,.12);
       border-radius:28px;
       padding:28px;
       backdrop-filter:blur(18px);
-      box-shadow:0 18px 50px rgba(0,0,0,.35)
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
     }
+
     h1{
       font-size:42px;
       text-align:center;
       margin-bottom:8px;
-      color:#00d2ff
+      color:#00d2ff;
+      line-height:1.2;
     }
+
     .sub{
       text-align:center;
       color:rgba(255,255,255,.75);
       margin-bottom:22px;
-      line-height:1.6
+      line-height:1.8;
+      font-size:14px;
     }
-    .input-group{margin-bottom:14px}
+
+    .input-group{
+      margin-bottom:14px;
+    }
+
     .input-group label{
       display:block;
       margin-bottom:8px;
       font-size:13px;
-      color:#dbeafe
+      color:#dbeafe;
     }
+
     .input-group input{
       width:100%;
       padding:15px 16px;
@@ -51,8 +71,13 @@
       background:rgba(8,15,30,.72);
       color:white;
       outline:none;
-      font-size:15px
+      font-size:15px;
     }
+
+    .input-group input::placeholder{
+      color:rgba(255,255,255,.45);
+    }
+
     .btn{
       width:100%;
       padding:15px;
@@ -63,15 +88,22 @@
       cursor:pointer;
       background:linear-gradient(90deg,#00c3ff,#7c3aed);
       color:#fff;
-      margin-top:8px
+      margin-top:8px;
     }
+
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+    }
+
     .link{
       display:block;
       text-align:center;
       margin-top:16px;
       color:#7dd3fc;
-      text-decoration:none
+      text-decoration:none;
     }
+
     .note{
       margin-top:16px;
       padding:14px;
@@ -80,27 +112,139 @@
       border:1px solid rgba(255,255,255,.08);
       color:rgba(255,255,255,.72);
       font-size:12px;
-      line-height:1.7
+      line-height:1.8;
+      text-align:center;
+    }
+
+    .status{
+      margin-top:14px;
+      min-height:24px;
+      text-align:center;
+      font-size:14px;
+      line-height:1.7;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Sudan Crypto</h1>
-    <div class="sub">Reset your demo password</div>
+    <div class="sub">أدخل بريدك الإلكتروني، ثم استلم كود إعادة التعيين، وبعدها أنشئ كلمة مرور جديدة لحسابك.</div>
 
     <div class="input-group">
-      <label>Email Address</label>
-      <input type="email" placeholder="Enter your email">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني">
     </div>
 
-    <button class="btn">Send Reset Link</button>
+    <div class="input-group">
+      <label>كود إعادة التعيين</label>
+      <input type="text" id="code" placeholder="أدخل كود التحقق المرسل إلى بريدك">
+    </div>
 
-    <a class="link" href="index.html">Back to Login</a>
+    <div class="input-group">
+      <label>كلمة المرور الجديدة</label>
+      <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة">
+    </div>
+
+    <button class="btn" id="sendBtn" onclick="sendResetCode()">إرسال كود إعادة التعيين</button>
+    <button class="btn" onclick="resetPassword()">تغيير كلمة المرور</button>
+
+    <div class="status" id="statusMsg"></div>
+
+    <a class="link" href="login.html">العودة إلى تسجيل الدخول</a>
 
     <div class="note">
-      Demo reset page only. No real emails are sent from this interface.
+      سيتم إرسال كود إعادة تعيين كلمة المرور إلى بريدك الإلكتروني المسجل في النظام.
     </div>
   </div>
+
+  <script>
+    const statusMsg = document.getElementById("statusMsg");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function showMessage(text, color) {
+      statusMsg.textContent = text;
+      statusMsg.style.color = color;
+    }
+
+    async function sendResetCode() {
+      const email = document.getElementById("email").value.trim();
+
+      if (!email) {
+        showMessage("أدخل البريد الإلكتروني أولاً", "#ff9ca8");
+        return;
+      }
+
+      try {
+        sendBtn.disabled = true;
+        sendBtn.textContent = "جاري الإرسال...";
+
+        const res = await fetch("/forgot-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+        const message = data.message || "";
+
+        if (message.includes("تم إرسال")) {
+          showMessage(message, "#7dd3fc");
+        } else {
+          showMessage(message || "فشل إرسال كود إعادة التعيين", "#ff9ca8");
+        }
+
+      } catch (error) {
+        console.log(error);
+        showMessage("حصل خطأ في الاتصال بالسيرفر", "#ff9ca8");
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "إرسال كود إعادة التعيين";
+      }
+    }
+
+    async function resetPassword() {
+      const email = document.getElementById("email").value.trim();
+      const code = document.getElementById("code").value.trim();
+      const newPassword = document.getElementById("newPassword").value.trim();
+
+      if (!email || !code || !newPassword) {
+        showMessage("املأ كل الحقول المطلوبة", "#ff9ca8");
+        return;
+      }
+
+      try {
+        const res = await fetch("/reset-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            code,
+            newPassword
+          })
+        });
+
+        const data = await res.json();
+        const message = data.message || "";
+
+        if (message.includes("تم تغيير كلمة المرور بنجاح")) {
+          showMessage(message, "#59f0a9");
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1500);
+        } else {
+          showMessage(message || "فشل تغيير كلمة المرور", "#ff9ca8");
+        }
+
+      } catch (error) {
+        console.log(error);
+        showMessage("حصل خطأ في الاتصال بالسيرفر", "#ff9ca8");
+      }
+    }
+  </script>
 </body>
 </html>
