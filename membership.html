@@ -13,25 +13,30 @@
     }
 
     body{
-      background:#050505;
+      min-height:100vh;
       color:#fff;
       padding-bottom:90px;
+      background:
+      radial-gradient(circle at top left, rgba(0,195,255,.12), transparent 24%),
+      radial-gradient(circle at bottom right, rgba(124,58,237,.14), transparent 28%),
+      linear-gradient(180deg,#07184a 0%, #081f5c 35%, #071431 100%);
     }
 
     .header{
-      padding:22px 16px 14px;
+      padding:24px 16px 14px;
       font-size:30px;
       font-weight:700;
-      color:#fff;
+      color:#ffffff;
     }
 
     .stats-box{
       margin:0 14px 18px;
-      background:#202020;
-      border-radius:18px;
+      background:rgba(8,22,58,0.92);
+      border-radius:22px;
       display:flex;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.07);
+      box-shadow:0 14px 30px rgba(0,0,0,0.22);
     }
 
     .stat{
@@ -41,19 +46,19 @@
     }
 
     .stat + .stat{
-      border-right:1px solid rgba(255,255,255,0.1);
+      border-right:1px solid rgba(255,255,255,0.08);
     }
 
     .stat-value{
       font-size:42px;
       font-weight:700;
       margin-bottom:10px;
-      color:#fff;
+      color:#ffffff;
     }
 
     .stat-label{
       font-size:16px;
-      color:#d4d4d4;
+      color:#d4e2ff;
       line-height:1.6;
     }
 
@@ -66,11 +71,12 @@
       font-size:26px;
       font-weight:700;
       margin-bottom:10px;
+      color:#ffffff;
     }
 
     .countdown-label{
       font-size:18px;
-      color:#dcdcdc;
+      color:#dce6ff;
     }
 
     .plans{
@@ -81,18 +87,18 @@
     }
 
     .plan-card{
-      background:#202020;
-      border-radius:18px;
+      background:rgba(8,22,58,0.94);
+      border-radius:22px;
       padding:18px 16px 20px;
-      border:1px solid rgba(255,255,255,0.05);
-      box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      border:1px solid rgba(255,255,255,0.07);
+      box-shadow:0 10px 24px rgba(0,0,0,0.22);
     }
 
     .plan-title{
       font-size:18px;
       font-weight:700;
       margin-bottom:18px;
-      color:#fff;
+      color:#ffffff;
     }
 
     .plan-grid{
@@ -107,7 +113,7 @@
       font-size:20px;
       font-weight:700;
       margin-bottom:8px;
-      color:#fff;
+      color:#ffffff;
     }
 
     .green{
@@ -116,7 +122,7 @@
 
     .plan-label{
       font-size:14px;
-      color:#d0d0d0;
+      color:#d0dcff;
       line-height:1.5;
     }
 
@@ -125,11 +131,12 @@
       height:56px;
       border:none;
       border-radius:30px;
-      background:#ff1d1d;
+      background:linear-gradient(90deg,#1cc4ff,#7d3cff);
       color:#fff;
       font-size:20px;
       font-weight:700;
       cursor:pointer;
+      box-shadow:0 10px 24px rgba(35,122,255,0.22);
     }
 
     .buy-btn:active{
@@ -142,7 +149,7 @@
       right:0;
       left:0;
       height:74px;
-      background:#0d0d0d;
+      background:#081532;
       border-top:1px solid rgba(255,255,255,0.08);
       display:flex;
       justify-content:space-around;
@@ -156,6 +163,7 @@
       font-size:14px;
       text-decoration:none;
       line-height:1.4;
+      min-width:70px;
     }
 
     .nav-item.active{
@@ -185,7 +193,7 @@
       <div class="stat-label">الأرباح التراكمية<br>(USDT)</div>
     </div>
     <div class="stat">
-      <div class="stat-value" id="todayProfit">0</div>
+      <div class="stat-value" id="todayProfit">0.00</div>
       <div class="stat-label">أرباح اليوم<br>(USDT)</div>
     </div>
   </div>
@@ -217,7 +225,7 @@
           <div class="plan-label">سعر الباقة</div>
         </div>
       </div>
-      <button class="buy-btn">افتح الآن 30 USDT</button>
+      <button class="buy-btn" onclick="goToDeposit(30, 'باقة النجمة الواحدة')">افتح الآن 30 USDT</button>
     </div>
 
     <div class="plan-card">
@@ -240,7 +248,7 @@
           <div class="plan-label">سعر الباقة</div>
         </div>
       </div>
-      <button class="buy-btn">افتح الآن 50 USDT</button>
+      <button class="buy-btn" onclick="goToDeposit(50, 'باقة النجمتين')">افتح الآن 50 USDT</button>
     </div>
 
     <div class="plan-card">
@@ -263,7 +271,7 @@
           <div class="plan-label">سعر الباقة</div>
         </div>
       </div>
-      <button class="buy-btn">افتح الآن 90 USDT</button>
+      <button class="buy-btn" onclick="goToDeposit(90, 'باقة الثلاثة نجوم')">افتح الآن 90 USDT</button>
     </div>
 
     <div class="plan-card">
@@ -286,7 +294,7 @@
           <div class="plan-label">سعر الباقة</div>
         </div>
       </div>
-      <button class="buy-btn">افتح الآن 120 USDT</button>
+      <button class="buy-btn" onclick="goToDeposit(120, 'باقة الأربعة نجوم')">افتح الآن 120 USDT</button>
     </div>
 
     <div class="plan-card">
@@ -309,17 +317,15 @@
           <div class="plan-label">سعر الباقة</div>
         </div>
       </div>
-      <button class="buy-btn">افتح الآن 200 USDT</button>
+      <button class="buy-btn" onclick="goToDeposit(200, 'باقة الخمسة نجوم')">افتح الآن 200 USDT</button>
     </div>
 
   </div>
 
   <div class="bottom-nav">
     <a class="nav-item" href="dashboard.html">الرئيسية</a>
-    <a class="nav-item" href="#">ترقية</a>
     <a class="nav-item active" href="membership.html">العضوية</a>
-    <a class="nav-item" href="#">سجل</a>
-    <a class="nav-item" href="#">أنا</a>
+    <a class="nav-item" href="#">السجل</a>
   </div>
 
   <script>
@@ -341,6 +347,11 @@
         String(seconds).padStart(2, "0");
     }
 
+    function goToDeposit(amount, planName) {
+      const url = "deposit.html?amount=" + encodeURIComponent(amount) + "&plan=" + encodeURIComponent(planName);
+      window.location.href = url;
+    }
+
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
@@ -352,4 +363,4 @@
   </script>
 
 </body>
-            </html>
+  </html>
