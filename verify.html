@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudan Crypto - توثيق الهوية</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Tajawal, Arial;
+}
+
+body{
+  background:linear-gradient(180deg,#08162f,#071431);
+  color:white;
+  min-height:100vh;
+  padding:20px 20px 100px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:bold;
+  color:#1cc4ff;
+}
+
+.back-link{
+  text-decoration:none;
+  color:#dce8ff;
+  font-size:14px;
+}
+
+.page-card{
+  max-width:760px;
+  margin:0 auto;
+  background:rgba(11,21,53,0.95);
+  border-radius:28px;
+  padding:24px;
+  box-shadow:0 20px 55px rgba(0,0,0,0.4);
+}
+
+.page-title{
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#1cc4ff;
+}
+
+.page-subtitle{
+  color:#b7c8ea;
+  line-height:1.9;
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.status-box{
+  background:#10214b;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:18px;
+}
+
+.status-label{
+  color:#b7c8ea;
+  font-size:13px;
+  margin-bottom:8px;
+}
+
+.status-value{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.status-pending{
+  color:#ffd54f;
+}
+
+.status-approved{
+  color:#7dffb0;
+}
+
+.status-rejected{
+  color:#ff8f8f;
+}
+
+.status-default{
+  color:#dce8ff;
+}
+
+.segment{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.segment-btn{
+  height:52px;
+  border:none;
+  border-radius:16px;
+  background:#10214b;
+  color:white;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.segment-btn.active{
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.input-group{
+  margin-bottom:14px;
+}
+
+.input-group.full{
+  grid-column:1 / -1;
+}
+
+.input-group label{
+  display:block;
+  margin-bottom:8px;
+  color:#dce8ff;
+  font-size:13px;
+}
+
+.input-group input,
+.input-group select{
+  width:100%;
+  height:50px;
+  border:none;
+  border-radius:14px;
+  background:#091632;
+  color:white;
+  padding:0 14px;
+  font-size:15px;
+  outline:none;
+}
+
+.input-group input[type="file"]{
+  padding:12px;
+  height:auto;
+}
+
+.note-box{
+  margin-top:12px;
+  padding:14px;
+  background:#10214b;
+  border-radius:16px;
+  color:#b7c8ea;
+  font-size:13px;
+  line-height:1.9;
+}
+
+.submit-btn{
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:16px;
+}
+
+.hidden{
+  display:none;
+}
+
+.message{
+  margin-top:14px;
+  min-height:24px;
+  text-align:center;
+  font-size:14px;
+  line-height:1.7;
+}
+
+.preview-box{
+  margin-top:18px;
+  padding:16px;
+  background:#10214b;
+  border-radius:18px;
+}
+
+.preview-title{
+  font-size:15px;
+  margin-bottom:12px;
+  color:#dce8ff;
+  font-weight:bold;
+}
+
+.preview-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.preview-item{
+  background:#091632;
+  border-radius:16px;
+  padding:12px;
+}
+
+.preview-item img{
+  width:100%;
+  border-radius:12px;
+  display:block;
+}
+
+.preview-item p{
+  margin-top:8px;
+  color:#cfe1ff;
+  font-size:13px;
+  word-break:break-all;
+}
+
+@media (max-width: 640px){
+  .segment,
+  .form-grid,
+  .preview-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">Sudan Crypto</div>
+  <a class="back-link" href="account.html">العودة إلى حسابي</a>
+</div>
+
+<div class="page-card">
+  <div class="page-title">توثيق الهوية</div>
+  <div class="page-subtitle">
+    أكمل بياناتك وارفع صور وثيقتك الرسمية بوضوح. بعد الإرسال سيتم تحويل طلبك إلى المراجعة، وعند الموافقة تتغير حالة الحساب إلى موثق.
+  </div>
+
+  <div class="status-box">
+    <div class="status-label">حالة التوثيق الحالية</div>
+    <div class="status-value status-default" id="verificationStatusText">غير موثق</div>
+  </div>
+
+  <div class="segment">
+    <button class="segment-btn active" id="nationalIdBtn" onclick="setDocumentType('national_id')">بطاقة قومية</button>
+    <button class="segment-btn" id="passportBtn" onclick="setDocumentType('passport')">جواز سفر</button>
+  </div>
+
+  <form id="verificationForm">
+    <div class="form-grid">
+      <div class="input-group full">
+        <label>الاسم الكامل كما في الوثيقة</label>
+        <input type="text" id="fullName" placeholder="أدخل الاسم الكامل">
+      </div>
+
+      <div class="input-group">
+        <label id="documentNumberLabel">رقم البطاقة القومية</label>
+        <input type="text" id="documentNumber" placeholder="أدخل الرقم">
+      </div>
+
+      <div class="input-group">
+        <label>تاريخ الميلاد</label>
+        <input type="date" id="birthDate">
+      </div>
+
+      <div class="input-group" id="expiryDateGroup" style="display:none;">
+        <label>تاريخ انتهاء الجواز</label>
+        <input type="date" id="expiryDate">
+      </div>
+
+      <div class="input-group">
+        <label>الدولة</label>
+        <input type="text" id="country" placeholder="أدخل الدولة">
+      </div>
+
+      <div class="input-group full" id="frontImageGroup">
+        <label>صورة الوجه الأمامي للبطاقة</label>
+        <input type="file" id="frontImage" accept="image/*">
+      </div>
+
+      <div class="input-group full" id="backImageGroup">
+        <label>صورة الوجه الخلفي للبطاقة</label>
+        <input type="file" id="backImage" accept="image/*">
+      </div>
+
+      <div class="input-group full hidden" id="passportImageGroup">
+        <label>صورة صفحة الجواز</label>
+        <input type="file" id="passportImage" accept="image/*">
+      </div>
+    </div>
+
+    <div class="note-box">
+      ارفع صور واضحة وكاملة للوثيقة، وتأكد أن جميع المعلومات ظاهرة. الصيغ المسموحة: JPG وPNG وWEBP. الحد الأقصى للصورة الواحدة 5MB.
+    </div>
+
+    <button type="submit" class="submit-btn">إرسال طلب التوثيق</button>
+    <div class="message" id="formMessage"></div>
+  </form>
+
+  <div class="preview-box" id="currentVerificationBox" style="display:none;">
+    <div class="preview-title">بيانات التوثيق الحالية</div>
+    <div class="preview-grid" id="previewGrid"></div>
+  </div>
+</div>
+
+<script>
+let currentDocumentType = "national_id";
+
+function setDocumentType(type) {
+  currentDocumentType = type;
+
+  document.getElementById("nationalIdBtn").classList.remove("active");
+  document.getElementById("passportBtn").classList.remove("active");
+
+  if (type === "national_id") {
+    document.getElementById("nationalIdBtn").classList.add("active");
+    document.getElementById("documentNumberLabel").textContent = "رقم البطاقة القومية";
+    document.getElementById("expiryDateGroup").style.display = "none";
+    document.getElementById("frontImageGroup").classList.remove("hidden");
+    document.getElementById("backImageGroup").classList.remove("hidden");
+    document.getElementById("passportImageGroup").classList.add("hidden");
+  } else {
+    document.getElementById("passportBtn").classList.add("active");
+    document.getElementById("documentNumberLabel").textContent = "رقم جواز السفر";
+    document.getElementById("expiryDateGroup").style.display = "block";
+    document.getElementById("frontImageGroup").classList.add("hidden");
+    document.getElementById("backImageGroup").classList.add("hidden");
+    document.getElementById("passportImageGroup").classList.remove("hidden");
+  }
+}
+
+function showFormMessage(text, color) {
+  const box = document.getElementById("formMessage");
+  box.textContent = text;
+  box.style.color = color;
+}
+
+function setStatusText(status) {
+  const el = document.getElementById("verificationStatusText");
+  el.textContent = status || "غير موثق";
+  el.className = "status-value";
+
+  if (status === "قيد المراجعة") {
+    el.classList.add("status-pending");
+  } else if (status === "موثق") {
+    el.classList.add("status-approved");
+  } else if (status === "مرفوض") {
+    el.classList.add("status-rejected");
+  } else {
+    el.classList.add("status-default");
+  }
+}
+
+async function loadVerificationStatus() {
+  const email = localStorage.getItem("loggedInEmail") || "";
+
+  if (!email) {
+    setStatusText("غير موثق");
+    return;
+  }
+
+  try {
+    const res = await fetch("/my-verification-status?email=" + encodeURIComponent(email));
+    const data = await res.json();
+
+    if (data.message) {
+      setStatusText("غير موثق");
+      return;
+    }
+
+    setStatusText(data.verification_status || "غير موثق");
+
+    if (data.verification_type === "passport") {
+      setDocumentType("passport");
+    } else {
+      setDocumentType("national_id");
+    }
+
+    if (data.verification_full_name) {
+      document.getElementById("fullName").value = data.verification_full_name || "";
+      document.getElementById("documentNumber").value = data.verification_document_number || "";
+      document.getElementById("birthDate").value = data.verification_birth_date || "";
+      document.getElementById("expiryDate").value = data.verification_expiry_date || "";
+      document.getElementById("country").value = data.verification_country || "";
+    }
+
+    const previewGrid = document.getElementById("previewGrid");
+    previewGrid.innerHTML = "";
+
+    if (data.verification_front_image) {
+      previewGrid.innerHTML += `
+        <div class="preview-item">
+          <img src="/${data.verification_front_image}" alt="front">
+          <p>صورة الوجه الأمامي</p>
+        </div>
+      `;
+    }
+
+    if (data.verification_back_image) {
+      previewGrid.innerHTML += `
+        <div class="preview-item">
+          <img src="/${data.verification_back_image}" alt="back">
+          <p>صورة الوجه الخلفي</p>
+        </div>
+      `;
+    }
+
+    if (data.verification_passport_image) {
+      previewGrid.innerHTML += `
+        <div class="preview-item">
+          <img src="/${data.verification_passport_image}" alt="passport">
+          <p>صورة صفحة الجواز</p>
+        </div>
+      `;
+    }
+
+    if (previewGrid.innerHTML.trim() !== "") {
+      document.getElementById("currentVerificationBox").style.display = "block";
+    }
+
+  } catch (error) {
+    console.log(error);
+    setStatusText("غير موثق");
+  }
+}
+
+document.getElementById("verificationForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const email = localStorage.getItem("loggedInEmail") || "";
+  const fullName = document.getElementById("fullName").value.trim();
+  const documentNumber = document.getElementById("documentNumber").value.trim();
+  const birthDate = document.getElementById("birthDate").value;
+  const expiryDate = document.getElementById("expiryDate").value;
+  const country = document.getElementById("country").value.trim();
+
+  if (!email) {
+    showFormMessage("يجب تسجيل الدخول أولاً", "#ff8f8f");
+    return;
+  }
+
+  if (!fullName || !documentNumber || !birthDate || !country) {
+    showFormMessage("املأ كل البيانات المطلوبة", "#ff8f8f");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("email", email);
+  formData.append("documentType", currentDocumentType);
+  formData.append("fullName", fullName);
+  formData.append("documentNumber", documentNumber);
+  formData.append("birthDate", birthDate);
+  formData.append("expiryDate", expiryDate);
+  formData.append("country", country);
+
+  if (currentDocumentType === "national_id") {
+    const frontImage = document.getElementById("frontImage").files[0];
+    const backImage = document.getElementById("backImage").files[0];
+
+    if (!frontImage || !backImage) {
+      showFormMessage("ارفع صورة الوجه الأمامي والخلفي للبطاقة", "#ff8f8f");
+      return;
+    }
+
+    formData.append("frontImage", frontImage);
+    formData.append("backImage", backImage);
+  }
+
+  if (currentDocumentType === "passport") {
+    const passportImage = document.getElementById("passportImage").files[0];
+
+    if (!passportImage) {
+      showFormMessage("ارفع صورة صفحة الجواز", "#ff8f8f");
+      return;
+    }
+
+    if (!expiryDate) {
+      showFormMessage("أدخل تاريخ انتهاء الجواز", "#ff8f8f");
+      return;
+    }
+
+    formData.append("passportImage", passportImage);
+  }
+
+  try {
+    showFormMessage("جاري إرسال طلب التوثيق...", "#7ed8ff");
+
+    const res = await fetch("/submit-verification", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    const message = data.message || "";
+
+    if (message.includes("تم إرسال")) {
+      showFormMessage(message, "#7dffb0");
+      setStatusText("قيد المراجعة");
+      loadVerificationStatus();
+    } else {
+      showFormMessage(message || "فشل إرسال طلب التوثيق", "#ff8f8f");
+    }
+
+  } catch (error) {
+    console.log(error);
+    showFormMessage("حصل خطأ في الاتصال بالسيرفر", "#ff8f8f");
+  }
+});
+
+setDocumentType("national_id");
+loadVerificationStatus();
+</script>
+
+</body>
+  </html>
