@@ -33,26 +33,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-/* إنشاء جدول المستخدمين */
-async function createTable() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name TEXT,
-        email TEXT UNIQUE,
-        password TEXT,
-        verified BOOLEAN DEFAULT false
-      )
-    `);
-    console.log("Users table ready");
-  } catch (error) {
-    console.log("CREATE TABLE ERROR:", error);
-  }
-}
-
-createTable();
-
 /* تخزين أكواد التحقق */
 let codes = {};
 
@@ -72,6 +52,95 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+/* إنشاء رمز إحالة من 6 حروف كبيرة فقط */
+function generateReferralCode() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  return code;
+}
+
+async function createUniqueReferralCode() {
+  let code = generateReferralCode();
+
+  while (true) {
+    const result = await pool.query(
+      "SELECT id FROM users WHERE referral_code = $1",
+      [code]
+    );
+
+    if (result.rows.length === 0) {
+      return code;
+    }
+
+    code = generateReferralCode();
+  }
+}
+
+async function ensureReferralColumns() {
+  try {
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level_1_referrer TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level_2_referrer TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level_3_referrer TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level_4_referrer TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level_5_referrer TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS has_deposited BOOLEAN DEFAULT false`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS first_deposit_amount NUMERIC DEFAULT 0`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_earnings NUMERIC DEFAULT 0`);
+    console.log("Referral columns ready");
+  } catch (error) {
+    console.log("ALTER TABLE ERROR:", error);
+  }
+}
+
+async function backfillReferralCodes() {
+  try {
+    const result = await pool.query(
+      "SELECT id FROM users WHERE referral_code IS NULL OR referral_code = ''"
+    );
+
+    for (const row of result.rows) {
+      const newCode = await createUniqueReferralCode();
+      await pool.query(
+        "UPDATE users SET referral_code = $1 WHERE id = $2",
+        [newCode, row.id]
+      );
+    }
+
+    console.log("Referral codes backfilled");
+  } catch (error) {
+    console.log("BACKFILL REFERRAL CODE ERROR:", error);
+  }
+}
+
+/* إنشاء جدول المستخدمين */
+async function initDatabase() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        email TEXT UNIQUE,
+        password TEXT,
+        verified BOOLEAN DEFAULT false
+      )
+    `);
+
+    console.log("Users table ready");
+
+    await ensureReferralColumns();
+    await backfillReferralCodes();
+  } catch (error) {
+    console.log("INIT DATABASE ERROR:", error);
+  }
+}
+
+initDatabase();
+
 /* عدد الحسابات */
 app.get("/users-count", async (req, res) => {
   try {
@@ -85,7 +154,7 @@ app.get("/users-count", async (req, res) => {
 
 /* تسجيل حساب */
 app.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, referralCode } = req.body;
 
   if (!name || !email || !password) {
     return res.json({ message: "املأ كل البيانات" });
@@ -98,12 +167,44 @@ app.post("/register", async (req, res) => {
   }
 
   const cleanEmail = email.trim().toLowerCase();
+  const cleanReferralCode = (referralCode || "").trim().toUpperCase();
 
   try {
     const existing = await pool.query(
-      "SELECT * FROM users WHERE email=$1",
+      "SELECT * FROM users WHERE email = $1",
       [cleanEmail]
     );
+
+    let referredBy = null;
+    let level1 = null;
+    let level2 = null;
+    let level3 = null;
+    let level4 = null;
+    let level5 = null;
+
+    if (cleanReferralCode) {
+      if (!/^[A-Z]{6}$/.test(cleanReferralCode)) {
+        return res.json({ message: "كود الإحالة غير صحيح" });
+      }
+
+      const referrerResult = await pool.query(
+        "SELECT * FROM users WHERE referral_code = $1 AND verified = true",
+        [cleanReferralCode]
+      );
+
+      if (referrerResult.rows.length === 0) {
+        return res.json({ message: "كود الإحالة غير صحيح" });
+      }
+
+      const referrer = referrerResult.rows[0];
+
+      referredBy = referrer.referral_code;
+      level1 = referrer.referral_code;
+      level2 = referrer.level_1_referrer || null;
+      level3 = referrer.level_2_referrer || null;
+      level4 = referrer.level_3_referrer || null;
+      level5 = referrer.level_4_referrer || null;
+    }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     codes[cleanEmail] = code;
@@ -116,6 +217,8 @@ app.post("/register", async (req, res) => {
         return res.json({ message: "هذا البريد الإلكتروني مسجل بالفعل" });
       }
 
+      const myReferralCode = user.referral_code || await createUniqueReferralCode();
+
       await transporter.sendMail({
         from: "Sudan Crypto <twbmyny803@gmail.com>",
         to: cleanEmail,
@@ -124,12 +227,38 @@ app.post("/register", async (req, res) => {
       });
 
       await pool.query(
-        "UPDATE users SET name=$1, password=$2 WHERE email=$3",
-        [name, password, cleanEmail]
+        `
+        UPDATE users SET
+          name = $1,
+          password = $2,
+          referral_code = $3,
+          referred_by = $4,
+          level_1_referrer = $5,
+          level_2_referrer = $6,
+          level_3_referrer = $7,
+          level_4_referrer = $8,
+          level_5_referrer = $9,
+          verified = false
+        WHERE email = $10
+        `,
+        [
+          name,
+          password,
+          myReferralCode,
+          referredBy,
+          level1,
+          level2,
+          level3,
+          level4,
+          level5,
+          cleanEmail
+        ]
       );
 
       return res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
     }
+
+    const myReferralCode = await createUniqueReferralCode();
 
     await transporter.sendMail({
       from: "Sudan Crypto <twbmyny803@gmail.com>",
@@ -139,8 +268,34 @@ app.post("/register", async (req, res) => {
     });
 
     await pool.query(
-      "INSERT INTO users (name,email,password,verified) VALUES ($1,$2,$3,false)",
-      [name, cleanEmail, password]
+      `
+      INSERT INTO users (
+        name,
+        email,
+        password,
+        verified,
+        referral_code,
+        referred_by,
+        level_1_referrer,
+        level_2_referrer,
+        level_3_referrer,
+        level_4_referrer,
+        level_5_referrer
+      )
+      VALUES ($1,$2,$3,false,$4,$5,$6,$7,$8,$9,$10)
+      `,
+      [
+        name,
+        cleanEmail,
+        password,
+        myReferralCode,
+        referredBy,
+        level1,
+        level2,
+        level3,
+        level4,
+        level5
+      ]
     );
 
     res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
@@ -162,7 +317,7 @@ app.post("/verify", async (req, res) => {
 
   try {
     await pool.query(
-      "UPDATE users SET verified=true WHERE email=$1",
+      "UPDATE users SET verified = true WHERE email = $1",
       [cleanEmail]
     );
 
@@ -182,7 +337,7 @@ app.post("/send-login-code", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1",
+      "SELECT * FROM users WHERE email = $1",
       [cleanEmail]
     );
 
@@ -221,7 +376,7 @@ app.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1",
+      "SELECT * FROM users WHERE email = $1",
       [cleanEmail]
     );
 
@@ -264,7 +419,7 @@ app.post("/forgot-password", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1 AND verified=true",
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
       [cleanEmail]
     );
 
@@ -318,7 +473,7 @@ app.post("/reset-password", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1 AND verified=true",
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
       [cleanEmail]
     );
 
@@ -333,7 +488,7 @@ app.post("/reset-password", async (req, res) => {
     }
 
     await pool.query(
-      "UPDATE users SET password=$1 WHERE email=$2",
+      "UPDATE users SET password = $1 WHERE email = $2",
       [newPassword, cleanEmail]
     );
 
@@ -344,6 +499,126 @@ app.post("/reset-password", async (req, res) => {
   } catch (error) {
     console.log("RESET PASSWORD ERROR:", error);
     res.json({ message: "فشل تغيير كلمة المرور" });
+  }
+});
+
+/* تعليم المستخدم كمودع لأول مرة + توزيع مكافآت الإحالة */
+app.post("/mark-deposit", async (req, res) => {
+  const { email, amount } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const depositAmount = Number(amount);
+
+  if (!cleanEmail || !depositAmount || depositAmount <= 0) {
+    return res.json({ message: "أدخل البريد الإلكتروني وقيمة إيداع صحيحة" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    if (user.has_deposited) {
+      return res.json({ message: "تم احتساب أول إيداع لهذا الحساب مسبقاً" });
+    }
+
+    await pool.query(
+      "UPDATE users SET has_deposited = true, first_deposit_amount = $1 WHERE email = $2",
+      [depositAmount, cleanEmail]
+    );
+
+    const rewardPlan = [
+      { code: user.level_1_referrer, percent: 15 },
+      { code: user.level_2_referrer, percent: 7 },
+      { code: user.level_3_referrer, percent: 4 },
+      { code: user.level_4_referrer, percent: 2 },
+      { code: user.level_5_referrer, percent: 1 }
+    ];
+
+    for (const item of rewardPlan) {
+      if (!item.code) continue;
+
+      const reward = (depositAmount * item.percent) / 100;
+
+      await pool.query(
+        "UPDATE users SET referral_earnings = COALESCE(referral_earnings, 0) + $1 WHERE referral_code = $2",
+        [reward, item.code]
+      );
+    }
+
+    res.json({ message: "تم تسجيل أول إيداع وتوزيع مكافآت الإحالة بنجاح" });
+
+  } catch (error) {
+    console.log("MARK DEPOSIT ERROR:", error);
+    res.json({ message: "فشل تسجيل الإيداع" });
+  }
+});
+
+/* بيانات نظام الإحالة للمستخدم */
+app.get("/my-referral-info", async (req, res) => {
+  const cleanEmail = ((req.query.email || "") + "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [cleanEmail]
+    );
+
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    const levels = [
+      { key: "level_1_referrer", name: "level1" },
+      { key: "level_2_referrer", name: "level2" },
+      { key: "level_3_referrer", name: "level3" },
+      { key: "level_4_referrer", name: "level4" },
+      { key: "level_5_referrer", name: "level5" }
+    ];
+
+    const stats = {};
+
+    for (const level of levels) {
+      const totalResult = await pool.query(
+        `SELECT COUNT(*) FROM users WHERE ${level.key} = $1`,
+        [user.referral_code]
+      );
+
+      const depositedResult = await pool.query(
+        `SELECT COUNT(*) FROM users WHERE ${level.key} = $1 AND has_deposited = true`,
+        [user.referral_code]
+      );
+
+      stats[level.name] = {
+        total_referrals: Number(totalResult.rows[0].count),
+        deposited_referrals: Number(depositedResult.rows[0].count)
+      };
+    }
+
+    res.json({
+      referral_code: user.referral_code,
+      referral_link: `${req.protocol}://${req.get("host")}/register.html?ref=${user.referral_code}`,
+      referral_earnings: Number(user.referral_earnings || 0),
+      has_deposited: user.has_deposited,
+      first_deposit_amount: Number(user.first_deposit_amount || 0),
+      levels: stats
+    });
+
+  } catch (error) {
+    console.log("MY REFERRAL INFO ERROR:", error);
+    res.json({ message: "فشل جلب بيانات الإحالة" });
   }
 });
 
