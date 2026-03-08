@@ -9,8 +9,22 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
+/* الصفحة الرئيسية تفتح تسجيل الدخول */
 app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+/* صفحات مباشرة */
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.get("/register", (req, res) => {
   res.sendFile(path.join(__dirname, "register.html"));
+});
+
+app.get("/forgot", (req, res) => {
+  res.sendFile(path.join(__dirname, "forgot.html"));
 });
 
 /* الاتصال بقاعدة البيانات */
