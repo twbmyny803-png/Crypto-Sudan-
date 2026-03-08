@@ -43,6 +43,7 @@ body{
   text-align:center;
   color:#9fb0d3;
   margin-bottom:25px;
+  line-height:1.7;
 }
 
 label{
@@ -101,6 +102,37 @@ button:disabled{
   width:120px;
 }
 
+.password-wrap{
+  position:relative;
+}
+
+.password-wrap input{
+  padding-left:90px;
+}
+
+.toggle-password{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  width:70px;
+  height:34px;
+  margin:0;
+  border:none;
+  border-radius:10px;
+  background:#12315f;
+  color:#fff;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.password-note{
+  margin-top:8px;
+  font-size:12px;
+  color:#9fb0d3;
+  line-height:1.7;
+}
+
 .status{
   margin-top:10px;
   font-size:14px;
@@ -157,10 +189,19 @@ button:disabled{
     </div>
 
     <label>كلمة المرور</label>
-    <input type="password" id="password" placeholder="أنشئ كلمة مرور قوية" required>
+    <div class="password-wrap">
+      <input type="password" id="password" placeholder="أنشئ كلمة مرور قوية" required>
+      <button type="button" class="toggle-password" onclick="togglePassword('password', this)">إظهار</button>
+    </div>
+    <div class="password-note">
+      يجب أن تكون كلمة المرور 8 خانات على الأقل وتحتوي على حرف كبير وحرف صغير ورقم ورمز واحد مثل @ أو $ أو !
+    </div>
 
     <label>تأكيد كلمة المرور</label>
-    <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور" required>
+    <div class="password-wrap">
+      <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور" required>
+      <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)">إظهار</button>
+    </div>
 
     <label>كود الإحالة (اختياري)</label>
     <input type="text" id="referralCode" placeholder="اتركه فارغ إذا لم يكن لديك كود">
@@ -185,6 +226,18 @@ const sendCodeBtn = document.getElementById("sendCodeBtn");
 function showMessage(text, color) {
   msg.innerText = text;
   msg.style.color = color;
+}
+
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+
+  if (input.type === "password") {
+    input.type = "text";
+    btn.innerText = "إخفاء";
+  } else {
+    input.type = "password";
+    btn.innerText = "إظهار";
+  }
 }
 
 async function sendCode() {
