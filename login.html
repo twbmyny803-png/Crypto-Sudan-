@@ -9,7 +9,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Tahoma, Arial, sans-serif;
+      font-family: "Tahoma", Arial, sans-serif;
     }
 
     body {
@@ -149,6 +149,7 @@
       color: #77d3ff;
       min-height: 22px;
       line-height: 1.8;
+      text-align: center;
     }
 
     .forgot {
@@ -161,11 +162,6 @@
       color: #27c3ff;
       text-decoration: none;
       font-size: 17px;
-    }
-
-    .forgot a:hover,
-    .bottom-link a:hover {
-      text-decoration: underline;
     }
 
     .login-btn {
@@ -246,7 +242,7 @@
               class="code-input"
               placeholder="أدخل كود التحقق"
             />
-            <button type="button" class="verify-btn" onclick="checkCodeOnly()">
+            <button type="button" class="verify-btn" onclick="markCodeEntered()">
               تحقق من الكود
             </button>
           </div>
@@ -315,7 +311,7 @@
         const data = await res.json();
         const message = data.message || "";
 
-        if (message.includes("تم إرسال")) {
+        if (message.includes("تم إرسال كود تسجيل الدخول")) {
           showMessage(message, "#77d3ff");
           codeChecked = false;
           startCountdown();
@@ -335,7 +331,6 @@
 
       timer = setInterval(() => {
         sendBtn.textContent = "إعادة الإرسال (" + countdown + " ثانية)";
-        showMessage("تم إرسال كود التحقق (" + countdown + " ثانية)", "#77d3ff");
         countdown--;
 
         if (countdown < 0) {
@@ -347,38 +342,16 @@
       }, 1000);
     }
 
-    async function checkCodeOnly() {
-      const email = document.getElementById("email").value.trim();
+    function markCodeEntered() {
       const code = document.getElementById("verificationCode").value.trim();
 
-      if (!email || !code) {
-        showMessage("أدخل البريد وكود التحقق.", "#ff9ca8");
+      if (!code) {
+        showMessage("الرجاء إدخال كود التحقق.", "#ff9ca8");
         return;
       }
 
-      try {
-        const res = await fetch("/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ email, code })
-        });
-
-        const data = await res.json();
-        const message = data.message || "";
-
-        if (message.includes("تم التحقق")) {
-          codeChecked = true;
-          showMessage(message, "#59f0a9");
-        } else {
-          codeChecked = false;
-          showMessage(message, "#ff9ca8");
-        }
-      } catch (error) {
-        console.log(error);
-        showMessage("خطأ في الاتصال بالسيرفر", "#ff9ca8");
-      }
+      codeChecked = true;
+      showMessage("تم إدخال الكود، أكمل تسجيل الدخول.", "#59f0a9");
     }
 
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
