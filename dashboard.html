@@ -83,6 +83,11 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 cursor:pointer;
+transition:0.2s ease;
+}
+
+.menu-item:hover{
+transform:translateY(-2px);
 }
 
 .menu-item img{
@@ -162,11 +167,11 @@ font-weight:bold;
 .referral-modal{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,0.65);
+background:rgba(0,0,0,0.72);
 display:none;
 align-items:center;
 justify-content:center;
-padding:20px;
+padding:18px;
 z-index:1000;
 }
 
@@ -176,11 +181,12 @@ display:flex;
 
 .referral-box{
 width:100%;
-max-width:520px;
-background:#0b1535;
-border-radius:24px;
-padding:20px;
-box-shadow:0 20px 50px rgba(0,0,0,0.5);
+max-width:560px;
+background:linear-gradient(180deg,#0b1535,#09132d);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:26px;
+padding:18px;
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
 max-height:90vh;
 overflow:auto;
 }
@@ -189,11 +195,11 @@ overflow:auto;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:15px;
+margin-bottom:16px;
 }
 
 .referral-title{
-font-size:22px;
+font-size:24px;
 color:#1cc4ff;
 font-weight:bold;
 }
@@ -202,24 +208,88 @@ font-weight:bold;
 background:#16305f;
 border:none;
 color:white;
-width:38px;
-height:38px;
-border-radius:10px;
+width:40px;
+height:40px;
+border-radius:12px;
 cursor:pointer;
-font-size:18px;
+font-size:20px;
+}
+
+.hero-card{
+background:linear-gradient(135deg,#132c63,#1e3b7e);
+border-radius:22px;
+padding:18px;
+margin-bottom:14px;
+}
+
+.hero-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+}
+
+.hero-text{
+flex:1;
+}
+
+.hero-label{
+font-size:13px;
+color:#cfe1ff;
+margin-bottom:6px;
+}
+
+.hero-value{
+font-size:30px;
+font-weight:bold;
+color:#7dffb0;
+}
+
+.hero-sub{
+margin-top:8px;
+font-size:13px;
+color:#d7e6ff;
+line-height:1.7;
+}
+
+.qr-wrap{
+width:110px;
+height:110px;
+background:white;
+border-radius:18px;
+padding:8px;
+flex-shrink:0;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.qr-wrap img{
+width:100%;
+height:100%;
+object-fit:contain;
+border-radius:10px;
+display:block;
+}
+
+.info-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:14px;
 }
 
 .info-card{
 background:#091632;
-border-radius:16px;
+border-radius:18px;
 padding:14px;
-margin-bottom:12px;
+border:1px solid rgba(255,255,255,0.05);
 }
 
 .info-label{
 font-size:13px;
 color:#9fb0d3;
-margin-bottom:6px;
+margin-bottom:8px;
 }
 
 .info-value{
@@ -227,76 +297,102 @@ font-size:16px;
 word-break:break-all;
 color:white;
 font-weight:bold;
+line-height:1.6;
 }
 
 .action-row{
-display:flex;
+display:grid;
+grid-template-columns:1fr 1fr;
 gap:10px;
-margin-top:10px;
+margin-top:12px;
 }
 
 .action-btn{
-flex:1;
-height:42px;
+height:44px;
 border:none;
-border-radius:12px;
+border-radius:14px;
 cursor:pointer;
 background:linear-gradient(90deg,#1cc4ff,#7d3cff);
 color:white;
 font-size:14px;
+font-weight:bold;
+}
+
+.share-title{
+font-size:15px;
+color:#dbe7ff;
+margin:6px 0 10px;
+font-weight:bold;
+}
+
+.share-row{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-bottom:14px;
+}
+
+.share-btn{
+height:46px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-size:14px;
+font-weight:bold;
+color:white;
+}
+
+.whatsapp{
+background:#1fa855;
+}
+
+.telegram{
+background:#229ed9;
+}
+
+.facebook{
+background:#1877f2;
+}
+
+.stats-title{
+font-size:16px;
+font-weight:bold;
+margin:4px 0 10px;
+color:#dbe7ff;
 }
 
 .stats-grid{
 display:grid;
 grid-template-columns:repeat(2,1fr);
 gap:10px;
-margin-top:10px;
 }
 
 .stat-card{
 background:#091632;
 border-radius:16px;
-padding:12px;
+padding:14px;
 text-align:center;
+border:1px solid rgba(255,255,255,0.05);
 }
 
 .stat-title{
 font-size:13px;
 color:#9fb0d3;
-margin-bottom:6px;
+margin-bottom:8px;
+line-height:1.6;
 }
 
 .stat-number{
-font-size:20px;
+font-size:22px;
 font-weight:bold;
 color:#1cc4ff;
 }
 
-.earnings-box{
-background:linear-gradient(90deg,#12315f,#192c6c);
-border-radius:16px;
-padding:14px;
-text-align:center;
-margin-bottom:12px;
-}
-
-.earnings-title{
-font-size:14px;
-color:#cddcff;
-margin-bottom:6px;
-}
-
-.earnings-value{
-font-size:26px;
-font-weight:bold;
-color:#6cff9f;
-}
-
 .referral-status{
-margin-top:10px;
+margin-top:12px;
 font-size:14px;
 text-align:center;
-min-height:20px;
+min-height:22px;
 line-height:1.7;
 }
 
@@ -304,8 +400,26 @@ line-height:1.7;
 .menu{
 grid-template-columns:repeat(2,1fr);
 }
+
+.info-grid{
+grid-template-columns:1fr;
+}
+
 .stats-grid{
 grid-template-columns:1fr;
+}
+
+.share-row{
+grid-template-columns:1fr;
+}
+
+.hero-top{
+flex-direction:column;
+align-items:stretch;
+}
+
+.qr-wrap{
+margin:auto;
 }
 }
 </style>
@@ -371,7 +485,6 @@ grid-template-columns:1fr;
   </div>
 
   <div class="movies">
-
     <div class="movie">
       <img src="https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" alt="">
     </div>
@@ -383,12 +496,10 @@ grid-template-columns:1fr;
     <div class="movie">
       <img src="https://image.tmdb.org/t/p/w500/v2LilmCylr3bL9TCZSj6syjowZh.jpg" alt="">
     </div>
-
   </div>
 </div>
 
 <div class="bottom-nav">
-
   <a href="dashboard.html" class="active">
     🏠
     <p>الرئيسية</p>
@@ -408,10 +519,8 @@ grid-template-columns:1fr;
     👤
     <p>حسابي</p>
   </a>
-
 </div>
 
-<!-- نافذة دعوة صديق -->
 <div class="referral-modal" id="referralModal">
   <div class="referral-box">
     <div class="referral-header">
@@ -419,27 +528,50 @@ grid-template-columns:1fr;
       <button class="close-btn" onclick="closeReferralBox()">✕</button>
     </div>
 
-    <div class="earnings-box">
-      <div class="earnings-title">إجمالي أرباح الإحالة</div>
-      <div class="earnings-value" id="referralEarnings">0 $</div>
-    </div>
+    <div class="hero-card">
+      <div class="hero-top">
+        <div class="hero-text">
+          <div class="hero-label">إجمالي أرباح الإحالة</div>
+          <div class="hero-value" id="referralEarnings">0 $</div>
+          <div class="hero-sub">
+            شارك رابطك الخاص مع أصدقائك. عند التسجيل والإيداع الأول تُحتسب لك المكافآت تلقائيًا حسب مستويات الإحالة.
+          </div>
+        </div>
 
-    <div class="info-card">
-      <div class="info-label">كود الإحالة الخاص بك</div>
-      <div class="info-value" id="referralCodeValue">...</div>
-      <div class="action-row">
-        <button class="action-btn" onclick="copyReferralCode()">نسخ الكود</button>
+        <div class="qr-wrap">
+          <img id="qrCodeImage" src="" alt="QR Code">
+        </div>
       </div>
     </div>
 
-    <div class="info-card">
-      <div class="info-label">رابط الدعوة الخاص بك</div>
-      <div class="info-value" id="referralLinkValue">...</div>
-      <div class="action-row">
-        <button class="action-btn" onclick="copyReferralLink()">نسخ الرابط</button>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-label">كود الإحالة الخاص بك</div>
+        <div class="info-value" id="referralCodeValue">...</div>
+        <div class="action-row">
+          <button class="action-btn" onclick="copyReferralCode()">نسخ الكود</button>
+          <button class="action-btn" onclick="shareReferralCode()">مشاركة الكود</button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-label">رابط الدعوة الخاص بك</div>
+        <div class="info-value" id="referralLinkValue">...</div>
+        <div class="action-row">
+          <button class="action-btn" onclick="copyReferralLink()">نسخ الرابط</button>
+          <button class="action-btn" onclick="shareNative()">مشاركة عامة</button>
+        </div>
       </div>
     </div>
 
+    <div class="share-title">مشاركة سريعة</div>
+    <div class="share-row">
+      <button class="share-btn whatsapp" onclick="shareWhatsApp()">واتساب</button>
+      <button class="share-btn telegram" onclick="shareTelegram()">تليجرام</button>
+      <button class="share-btn facebook" onclick="shareFacebook()">فيسبوك</button>
+    </div>
+
+    <div class="stats-title">إحصائيات الإحالة</div>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-title">المستوى الأول - المدعوين</div>
@@ -501,6 +633,11 @@ function showReferralStatus(text, color) {
   box.style.color = color;
 }
 
+function buildQr(link) {
+  if (!link) return "";
+  return "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(link);
+}
+
 async function openReferralBox() {
   document.getElementById("referralModal").classList.add("active");
 
@@ -544,6 +681,9 @@ async function openReferralBox() {
     document.getElementById("l5Total").innerText = data.levels.level5.total_referrals;
     document.getElementById("l5Deposited").innerText = data.levels.level5.deposited_referrals;
 
+    const qrUrl = buildQr(currentReferralLink);
+    document.getElementById("qrCodeImage").src = qrUrl || "";
+
     showReferralStatus("تم تحميل بيانات الإحالة بنجاح", "#6cff9f");
 
   } catch (error) {
@@ -557,7 +697,10 @@ function closeReferralBox() {
 }
 
 function copyReferralCode() {
-  if (!currentReferralCode) return;
+  if (!currentReferralCode) {
+    showReferralStatus("كود الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
 
   navigator.clipboard.writeText(currentReferralCode).then(() => {
     showReferralStatus("تم نسخ كود الإحالة", "#6cff9f");
@@ -567,13 +710,82 @@ function copyReferralCode() {
 }
 
 function copyReferralLink() {
-  if (!currentReferralLink) return;
+  if (!currentReferralLink || currentReferralLink.endsWith("ref=")) {
+    showReferralStatus("رابط الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
 
   navigator.clipboard.writeText(currentReferralLink).then(() => {
     showReferralStatus("تم نسخ رابط الإحالة", "#6cff9f");
   }).catch(() => {
     showReferralStatus("تعذر نسخ رابط الإحالة", "#ff8080");
   });
+}
+
+function shareText() {
+  return "انضم إلى منصة Sudan Crypto عبر رابط الإحالة الخاص بي:\n" + currentReferralLink + "\n\nكود الإحالة: " + currentReferralCode;
+}
+
+function shareNative() {
+  if (!currentReferralLink) {
+    showReferralStatus("رابط الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Sudan Crypto",
+      text: shareText(),
+      url: currentReferralLink
+    }).catch(() => {});
+  } else {
+    copyReferralLink();
+  }
+}
+
+function shareWhatsApp() {
+  if (!currentReferralLink) {
+    showReferralStatus("رابط الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
+
+  const text = encodeURIComponent(shareText());
+  window.open("https://wa.me/?text=" + text, "_blank");
+}
+
+function shareTelegram() {
+  if (!currentReferralLink) {
+    showReferralStatus("رابط الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
+
+  const text = encodeURIComponent(shareText());
+  window.open("https://t.me/share/url?url=" + encodeURIComponent(currentReferralLink) + "&text=" + text, "_blank");
+}
+
+function shareFacebook() {
+  if (!currentReferralLink) {
+    showReferralStatus("رابط الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
+
+  window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(currentReferralLink), "_blank");
+}
+
+function shareReferralCode() {
+  if (!currentReferralCode) {
+    showReferralStatus("كود الإحالة غير جاهز بعد", "#ff8080");
+    return;
+  }
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Sudan Crypto",
+      text: "كود الإحالة الخاص بي في Sudan Crypto: " + currentReferralCode
+    }).catch(() => {});
+  } else {
+    copyReferralCode();
+  }
 }
 
 document.getElementById("referralModal").addEventListener("click", function(e) {
