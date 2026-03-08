@@ -28,14 +28,12 @@ app.get("/forgot", (req, res) => {
 });
 
 /* الاتصال بقاعدة البيانات */
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
 /* إنشاء جدول المستخدمين */
-
 async function createTable() {
   try {
     await pool.query(`
@@ -56,11 +54,16 @@ async function createTable() {
 createTable();
 
 /* تخزين أكواد التحقق */
-
 let codes = {};
 
-/* إعداد إرسال الإيميل */
+/* حماية كلمة السر */
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!])[A-Za-z\d@$!]{8,}$/;
 
+function isStrongPassword(password) {
+  return passwordRegex.test(password);
+}
+
+/* إعداد إرسال الإيميل */
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -70,7 +73,6 @@ const transporter = nodemailer.createTransport({
 });
 
 /* عدد الحسابات */
-
 app.get("/users-count", async (req, res) => {
   try {
     const result = await pool.query("SELECT COUNT(*) FROM users");
@@ -82,12 +84,17 @@ app.get("/users-count", async (req, res) => {
 });
 
 /* تسجيل حساب */
-
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.json({ message: "املأ كل البيانات" });
+  }
+
+  if (!isStrongPassword(password)) {
+    return res.json({
+      message: "كلمة المرور يجب أن تكون 8 خانات على الأقل وتحتوي على حرف كبير وحرف صغير ورقم ورمز واحد مثل @ أو $ أو !"
+    });
   }
 
   const cleanEmail = email.trim().toLowerCase();
@@ -145,7 +152,6 @@ app.post("/register", async (req, res) => {
 });
 
 /* التحقق من كود التسجيل */
-
 app.post("/verify", async (req, res) => {
   const { email, code } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
@@ -170,7 +176,6 @@ app.post("/verify", async (req, res) => {
 });
 
 /* إرسال كود تسجيل الدخول */
-
 app.post("/send-login-code", async (req, res) => {
   const { email } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
@@ -210,7 +215,6 @@ app.post("/send-login-code", async (req, res) => {
 });
 
 /* تسجيل الدخول */
-
 app.post("/login", async (req, res) => {
   const { email, password, code } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
@@ -250,7 +254,6 @@ app.post("/login", async (req, res) => {
 });
 
 /* إرسال كود إعادة تعيين كلمة المرور */
-
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
@@ -295,13 +298,18 @@ app.post("/forgot-password", async (req, res) => {
 });
 
 /* إعادة تعيين كلمة المرور */
-
 app.post("/reset-password", async (req, res) => {
   const { email, code, newPassword } = req.body;
   const cleanEmail = (email || "").trim().toLowerCase();
 
   if (!cleanEmail || !code || !newPassword) {
     return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (!isStrongPassword(newPassword)) {
+    return res.json({
+      message: "كلمة المرور الجديدة يجب أن تكون 8 خانات على الأقل وتحتوي على حرف كبير وحرف صغير ورقم ورمز واحد مثل @ أو $ أو !"
+    });
   }
 
   if (codes[cleanEmail] != code) {
@@ -320,6 +328,10 @@ app.post("/reset-password", async (req, res) => {
       return res.json({ message: "هذا البريد الإلكتروني غير مسجل" });
     }
 
+    if (user.password === newPassword) {
+      return res.json({ message: "يجب أن تكون كلمة المرور الجديدة مختلفة عن القديمة" });
+    }
+
     await pool.query(
       "UPDATE users SET password=$1 WHERE email=$2",
       [newPassword, cleanEmail]
@@ -336,7 +348,6 @@ app.post("/reset-password", async (req, res) => {
 });
 
 /* تشغيل السيرفر */
-
 app.listen(PORT, () => {
   console.log("Server started on port " + PORT);
 });
