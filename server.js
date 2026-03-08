@@ -144,7 +144,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-/* التحقق من الكود */
+/* التحقق من كود التسجيل */
 
 app.post("/verify", async (req, res) => {
   const { email, code } = req.body;
@@ -246,6 +246,92 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.log("LOGIN ERROR:", error);
     res.json({ message: "فشل تسجيل الدخول" });
+  }
+});
+
+/* إرسال كود إعادة تعيين كلمة المرور */
+
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email=$1",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    codes[cleanEmail] = code;
+
+    await transporter.sendMail({
+      from: "Sudan Crypto <twbmyny803@gmail.com>",
+      to: cleanEmail,
+      subject: "Sudan Crypto Password Reset Code",
+      html: `
+        <h2>Sudan Crypto</h2>
+        <p>كود إعادة تعيين كلمة المرور:</p>
+        <h1>${code}</h1>
+        <p>إذا لم تطلب إعادة تعيين كلمة المرور، تجاهل هذه الرسالة.</p>
+      `
+    });
+
+    res.json({ message: "تم إرسال كود إعادة تعيين كلمة المرور إلى بريدك الإلكتروني" });
+
+  } catch (error) {
+    console.log("FORGOT PASSWORD ERROR:", error);
+    res.json({ message: "فشل إرسال كود إعادة التعيين" });
+  }
+});
+
+/* إعادة تعيين كلمة المرور */
+
+app.post("/reset-password", async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail || !code || !newPassword) {
+    return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (codes[cleanEmail] != code) {
+    return res.json({ message: "كود إعادة التعيين غير صحيح" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email=$1",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    await pool.query(
+      "UPDATE users SET password=$1 WHERE email=$2",
+      [newPassword, cleanEmail]
+    );
+
+    delete codes[cleanEmail];
+
+    res.json({ message: "تم تغيير كلمة المرور بنجاح" });
+
+  } catch (error) {
+    console.log("RESET PASSWORD ERROR:", error);
+    res.json({ message: "فشل تغيير كلمة المرور" });
   }
 });
 
