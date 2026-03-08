@@ -43,6 +43,11 @@ function isStrongPassword(password) {
   return passwordRegex.test(password);
 }
 
+/* التحقق من كلمة مرور السحب */
+function isValidWithdrawPassword(password) {
+  return /^\d{6}$/.test(password || "");
+}
+
 /* إعداد إرسال الإيميل */
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -91,7 +96,11 @@ async function ensureReferralColumns() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS has_deposited BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS first_deposit_amount NUMERIC DEFAULT 0`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_earnings NUMERIC DEFAULT 0`);
-    console.log("Referral columns ready");
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS withdraw_password TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS vip_level TEXT DEFAULT 'VIP0'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'غير موثق'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC DEFAULT 0`);
+    console.log("Referral and account columns ready");
   } catch (error) {
     console.log("ALTER TABLE ERROR:", error);
   }
@@ -149,6 +158,42 @@ app.get("/users-count", async (req, res) => {
   } catch (error) {
     console.log("USERS COUNT ERROR:", error);
     res.json({ count: 0 });
+  }
+});
+
+/* بيانات الحساب الأساسية */
+app.get("/my-account-info", async (req, res) => {
+  const cleanEmail = ((req.query.email || "") + "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT name, email, verified, has_deposited, withdraw_password, vip_level, verification_status, balance FROM users WHERE email = $1",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    res.json({
+      name: user.name || "",
+      email: user.email || "",
+      verified: !!user.verified,
+      vip_status: user.vip_level || (user.has_deposited ? "VIP1" : "VIP0"),
+      verification_status: user.verification_status || (user.verified ? "مفعل" : "غير موثق"),
+      balance: Number(user.balance || 0),
+      has_withdraw_password: !!user.withdraw_password
+    });
+
+  } catch (error) {
+    console.log("MY ACCOUNT INFO ERROR:", error);
+    res.json({ message: "فشل جلب بيانات الحساب" });
   }
 });
 
@@ -400,7 +445,7 @@ app.post("/login", async (req, res) => {
 
     delete codes[cleanEmail];
 
-    res.json({ message: "تم تسجيل الدخول بنجاح" });
+    res.json({ message: "تم تسجيل الدخول بنجاح", name: user.name || "" });
 
   } catch (error) {
     console.log("LOGIN ERROR:", error);
@@ -499,6 +544,198 @@ app.post("/reset-password", async (req, res) => {
   } catch (error) {
     console.log("RESET PASSWORD ERROR:", error);
     res.json({ message: "فشل تغيير كلمة المرور" });
+  }
+});
+
+/* إرسال كود إنشاء/تغيير كلمة مرور السحب */
+app.post("/send-withdraw-password-code", async (req, res) => {
+  const { email } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    codes[cleanEmail] = code;
+
+    await transporter.sendMail({
+      from: "Sudan Crypto <twbmyny803@gmail.com>",
+      to: cleanEmail,
+      subject: "Sudan Crypto Withdraw Password Code",
+      html: `
+        <h2>Sudan Crypto</h2>
+        <p>كود التحقق الخاص بكلمة مرور السحب:</p>
+        <h1>${code}</h1>
+        <p>إذا لم تطلب هذا الإجراء، تجاهل هذه الرسالة.</p>
+      `
+    });
+
+    res.json({ message: "تم إرسال كود التحقق إلى بريدك" });
+
+  } catch (error) {
+    console.log("SEND WITHDRAW PASSWORD CODE ERROR:", error);
+    res.json({ message: "فشل إرسال الكود" });
+  }
+});
+
+/* إنشاء كلمة مرور السحب */
+app.post("/create-withdraw-password", async (req, res) => {
+  const { email, withdrawPassword, code } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail || !withdrawPassword || !code) {
+    return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (!isValidWithdrawPassword(withdrawPassword)) {
+    return res.json({ message: "كلمة مرور السحب يجب أن تكون 6 أرقام فقط" });
+  }
+
+  if (codes[cleanEmail] != code) {
+    return res.json({ message: "كود التحقق غير صحيح" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    if (user.withdraw_password) {
+      return res.json({ message: "كلمة مرور السحب موجودة بالفعل" });
+    }
+
+    await pool.query(
+      "UPDATE users SET withdraw_password = $1 WHERE email = $2",
+      [withdrawPassword, cleanEmail]
+    );
+
+    delete codes[cleanEmail];
+
+    res.json({ message: "تم إنشاء كلمة مرور السحب بنجاح" });
+
+  } catch (error) {
+    console.log("CREATE WITHDRAW PASSWORD ERROR:", error);
+    res.json({ message: "فشل إنشاء كلمة مرور السحب" });
+  }
+});
+
+/* تغيير كلمة مرور السحب */
+app.post("/change-withdraw-password", async (req, res) => {
+  const { email, oldWithdrawPassword, newWithdrawPassword, code } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail || !oldWithdrawPassword || !newWithdrawPassword || !code) {
+    return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (!isValidWithdrawPassword(newWithdrawPassword)) {
+    return res.json({ message: "كلمة مرور السحب الجديدة يجب أن تكون 6 أرقام فقط" });
+  }
+
+  if (codes[cleanEmail] != code) {
+    return res.json({ message: "كود التحقق غير صحيح" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    if (!user.withdraw_password) {
+      return res.json({ message: "لم يتم إنشاء كلمة مرور السحب بعد" });
+    }
+
+    if (user.withdraw_password !== oldWithdrawPassword) {
+      return res.json({ message: "كلمة مرور السحب القديمة غير صحيحة" });
+    }
+
+    if (oldWithdrawPassword === newWithdrawPassword) {
+      return res.json({ message: "يجب أن تكون كلمة مرور السحب الجديدة مختلفة عن القديمة" });
+    }
+
+    await pool.query(
+      "UPDATE users SET withdraw_password = $1 WHERE email = $2",
+      [newWithdrawPassword, cleanEmail]
+    );
+
+    delete codes[cleanEmail];
+
+    res.json({ message: "تم تغيير كلمة مرور السحب بنجاح" });
+
+  } catch (error) {
+    console.log("CHANGE WITHDRAW PASSWORD ERROR:", error);
+    res.json({ message: "فشل تغيير كلمة مرور السحب" });
+  }
+});
+
+/* نسيت كلمة مرور السحب */
+app.post("/forgot-withdraw-password", async (req, res) => {
+  const { email, newWithdrawPassword, code } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+
+  if (!cleanEmail || !newWithdrawPassword || !code) {
+    return res.json({ message: "املأ كل البيانات المطلوبة" });
+  }
+
+  if (!isValidWithdrawPassword(newWithdrawPassword)) {
+    return res.json({ message: "كلمة مرور السحب يجب أن تكون 6 أرقام فقط" });
+  }
+
+  if (codes[cleanEmail] != code) {
+    return res.json({ message: "كود التحقق غير صحيح" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND verified = true",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    await pool.query(
+      "UPDATE users SET withdraw_password = $1 WHERE email = $2",
+      [newWithdrawPassword, cleanEmail]
+    );
+
+    delete codes[cleanEmail];
+
+    res.json({ message: "تم إعادة تعيين كلمة مرور السحب بنجاح" });
+
+  } catch (error) {
+    console.log("FORGOT WITHDRAW PASSWORD ERROR:", error);
+    res.json({ message: "فشل إعادة تعيين كلمة مرور السحب" });
   }
 });
 
