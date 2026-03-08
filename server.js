@@ -261,14 +261,14 @@ app.post("/forgot-password", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1",
+      "SELECT * FROM users WHERE email=$1 AND verified=true",
       [cleanEmail]
     );
 
     const user = result.rows[0];
 
     if (!user) {
-      return res.json({ message: "الحساب غير موجود" });
+      return res.json({ message: "هذا البريد الإلكتروني غير مسجل" });
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -310,14 +310,14 @@ app.post("/reset-password", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE email=$1",
+      "SELECT * FROM users WHERE email=$1 AND verified=true",
       [cleanEmail]
     );
 
     const user = result.rows[0];
 
     if (!user) {
-      return res.json({ message: "الحساب غير موجود" });
+      return res.json({ message: "هذا البريد الإلكتروني غير مسجل" });
     }
 
     await pool.query(
