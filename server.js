@@ -1,6 +1,8 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
 const { Pool } = require("pg");
 
 const app = express();
@@ -8,6 +10,48 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(__dirname));
+
+/* تجهيز مجلدات رفع الملفات */
+const uploadBaseDir = path.join(__dirname, "uploads");
+const verificationDir = path.join(uploadBaseDir, "verification");
+
+if (!fs.existsSync(uploadBaseDir)) {
+  fs.mkdirSync(uploadBaseDir, { recursive: true });
+}
+
+if (!fs.existsSync(verificationDir)) {
+  fs.mkdirSync(verificationDir, { recursive: true });
+}
+
+app.use("/uploads", express.static(uploadBaseDir));
+
+/* إعداد رفع الصور */
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, verificationDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
+    const safeName = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, safeName);
+  }
+});
+
+function fileFilter(req, file, cb) {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.mimetype)) {
+    return cb(new Error("نوع الملف غير مدعوم، ارفع صورة فقط"));
+  }
+  cb(null, true);
+}
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
 
 /* الصفحة الرئيسية تفتح تسجيل الدخول */
 app.get("/", (req, res) => {
@@ -25,6 +69,10 @@ app.get("/register", (req, res) => {
 
 app.get("/forgot", (req, res) => {
   res.sendFile(path.join(__dirname, "forgot.html"));
+});
+
+app.get("/verify-identity", (req, res) => {
+  res.sendFile(path.join(__dirname, "verify.html"));
 });
 
 /* الاتصال بقاعدة البيانات */
@@ -100,7 +148,20 @@ async function ensureReferralColumns() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS vip_level TEXT DEFAULT 'VIP0'`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'غير موثق'`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS balance NUMERIC DEFAULT 0`);
-    console.log("Referral and account columns ready");
+
+    /* أعمدة التوثيق */
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_type TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_full_name TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_document_number TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_birth_date TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_expiry_date TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_country TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_front_image TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_back_image TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_passport_image TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_submitted_at TEXT`);
+
+    console.log("Referral, account and verification columns ready");
   } catch (error) {
     console.log("ALTER TABLE ERROR:", error);
   }
@@ -171,7 +232,20 @@ app.get("/my-account-info", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT name, email, verified, has_deposited, withdraw_password, vip_level, verification_status, balance FROM users WHERE email = $1",
+      `
+      SELECT
+        name,
+        email,
+        verified,
+        has_deposited,
+        withdraw_password,
+        vip_level,
+        verification_status,
+        verification_type,
+        balance
+      FROM users
+      WHERE email = $1
+      `,
       [cleanEmail]
     );
 
@@ -186,14 +260,68 @@ app.get("/my-account-info", async (req, res) => {
       email: user.email || "",
       verified: !!user.verified,
       vip_status: user.vip_level || (user.has_deposited ? "VIP1" : "VIP0"),
-      verification_status: user.verification_status || (user.verified ? "مفعل" : "غير موثق"),
+      verification_status: user.verification_status || "غير موثق",
+      verification_type: user.verification_type || "",
       balance: Number(user.balance || 0),
       has_withdraw_password: !!user.withdraw_password
     });
-
   } catch (error) {
     console.log("MY ACCOUNT INFO ERROR:", error);
     res.json({ message: "فشل جلب بيانات الحساب" });
+  }
+});
+
+/* بيانات التوثيق */
+app.get("/my-verification-status", async (req, res) => {
+  const cleanEmail = ((req.query.email || "") + "").trim().toLowerCase();
+
+  if (!cleanEmail) {
+    return res.json({ message: "أدخل البريد الإلكتروني" });
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        verification_status,
+        verification_type,
+        verification_full_name,
+        verification_document_number,
+        verification_birth_date,
+        verification_expiry_date,
+        verification_country,
+        verification_front_image,
+        verification_back_image,
+        verification_passport_image,
+        verification_submitted_at
+      FROM users
+      WHERE email = $1
+      `,
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    res.json({
+      verification_status: user.verification_status || "غير موثق",
+      verification_type: user.verification_type || "",
+      verification_full_name: user.verification_full_name || "",
+      verification_document_number: user.verification_document_number || "",
+      verification_birth_date: user.verification_birth_date || "",
+      verification_expiry_date: user.verification_expiry_date || "",
+      verification_country: user.verification_country || "",
+      verification_front_image: user.verification_front_image || "",
+      verification_back_image: user.verification_back_image || "",
+      verification_passport_image: user.verification_passport_image || "",
+      verification_submitted_at: user.verification_submitted_at || ""
+    });
+  } catch (error) {
+    console.log("MY VERIFICATION STATUS ERROR:", error);
+    res.json({ message: "فشل جلب حالة التوثيق" });
   }
 });
 
@@ -344,7 +472,6 @@ app.post("/register", async (req, res) => {
     );
 
     res.json({ message: "تم إرسال كود التحقق إلى بريدك الإلكتروني" });
-
   } catch (error) {
     console.log("REGISTER ERROR:", error);
     res.json({ message: "فشل إنشاء الحساب" });
@@ -407,7 +534,6 @@ app.post("/send-login-code", async (req, res) => {
     });
 
     res.json({ message: "تم إرسال كود تسجيل الدخول إلى بريدك" });
-
   } catch (error) {
     console.log("SEND LOGIN CODE ERROR:", error);
     res.json({ message: "فشل إرسال الكود" });
@@ -446,7 +572,6 @@ app.post("/login", async (req, res) => {
     delete codes[cleanEmail];
 
     res.json({ message: "تم تسجيل الدخول بنجاح", name: user.name || "" });
-
   } catch (error) {
     console.log("LOGIN ERROR:", error);
     res.json({ message: "فشل تسجيل الدخول" });
@@ -490,7 +615,6 @@ app.post("/forgot-password", async (req, res) => {
     });
 
     res.json({ message: "تم إرسال كود إعادة تعيين كلمة المرور إلى بريدك الإلكتروني" });
-
   } catch (error) {
     console.log("FORGOT PASSWORD ERROR:", error);
     res.json({ message: "فشل إرسال كود إعادة التعيين" });
@@ -540,7 +664,6 @@ app.post("/reset-password", async (req, res) => {
     delete codes[cleanEmail];
 
     res.json({ message: "تم تغيير كلمة المرور بنجاح" });
-
   } catch (error) {
     console.log("RESET PASSWORD ERROR:", error);
     res.json({ message: "فشل تغيير كلمة المرور" });
@@ -584,7 +707,6 @@ app.post("/send-withdraw-password-code", async (req, res) => {
     });
 
     res.json({ message: "تم إرسال كود التحقق إلى بريدك" });
-
   } catch (error) {
     console.log("SEND WITHDRAW PASSWORD CODE ERROR:", error);
     res.json({ message: "فشل إرسال الكود" });
@@ -632,7 +754,6 @@ app.post("/create-withdraw-password", async (req, res) => {
     delete codes[cleanEmail];
 
     res.json({ message: "تم إنشاء كلمة مرور السحب بنجاح" });
-
   } catch (error) {
     console.log("CREATE WITHDRAW PASSWORD ERROR:", error);
     res.json({ message: "فشل إنشاء كلمة مرور السحب" });
@@ -688,7 +809,6 @@ app.post("/change-withdraw-password", async (req, res) => {
     delete codes[cleanEmail];
 
     res.json({ message: "تم تغيير كلمة مرور السحب بنجاح" });
-
   } catch (error) {
     console.log("CHANGE WITHDRAW PASSWORD ERROR:", error);
     res.json({ message: "فشل تغيير كلمة مرور السحب" });
@@ -732,10 +852,162 @@ app.post("/forgot-withdraw-password", async (req, res) => {
     delete codes[cleanEmail];
 
     res.json({ message: "تم إعادة تعيين كلمة مرور السحب بنجاح" });
-
   } catch (error) {
     console.log("FORGOT WITHDRAW PASSWORD ERROR:", error);
     res.json({ message: "فشل إعادة تعيين كلمة مرور السحب" });
+  }
+});
+
+/* إرسال طلب توثيق الهوية */
+app.post(
+  "/submit-verification",
+  upload.fields([
+    { name: "frontImage", maxCount: 1 },
+    { name: "backImage", maxCount: 1 },
+    { name: "passportImage", maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        email,
+        documentType,
+        fullName,
+        documentNumber,
+        birthDate,
+        expiryDate,
+        country
+      } = req.body;
+
+      const cleanEmail = (email || "").trim().toLowerCase();
+      const cleanType = (documentType || "").trim();
+
+      if (!cleanEmail || !cleanType || !fullName || !documentNumber || !birthDate || !country) {
+        return res.json({ message: "املأ كل البيانات المطلوبة" });
+      }
+
+      if (cleanType !== "national_id" && cleanType !== "passport") {
+        return res.json({ message: "نوع الوثيقة غير صحيح" });
+      }
+
+      const result = await pool.query(
+        "SELECT * FROM users WHERE email = $1 AND verified = true",
+        [cleanEmail]
+      );
+
+      const user = result.rows[0];
+
+      if (!user) {
+        return res.json({ message: "الحساب غير موجود أو غير مفعل" });
+      }
+
+      if (user.verification_status === "قيد المراجعة") {
+        return res.json({ message: "لديك طلب توثيق قيد المراجعة بالفعل" });
+      }
+
+      if (user.verification_status === "موثق") {
+        return res.json({ message: "الحساب موثق بالفعل" });
+      }
+
+      let frontImage = "";
+      let backImage = "";
+      let passportImage = "";
+
+      if (cleanType === "national_id") {
+        if (!req.files || !req.files.frontImage || !req.files.backImage) {
+          return res.json({ message: "ارفع صورة الوجه الأمامي والخلفي للبطاقة القومية" });
+        }
+
+        frontImage = "uploads/verification/" + req.files.frontImage[0].filename;
+        backImage = "uploads/verification/" + req.files.backImage[0].filename;
+      }
+
+      if (cleanType === "passport") {
+        if (!req.files || !req.files.passportImage) {
+          return res.json({ message: "ارفع صورة صفحة الجواز" });
+        }
+
+        if (!expiryDate) {
+          return res.json({ message: "أدخل تاريخ انتهاء الجواز" });
+        }
+
+        passportImage = "uploads/verification/" + req.files.passportImage[0].filename;
+      }
+
+      await pool.query(
+        `
+        UPDATE users SET
+          verification_type = $1,
+          verification_full_name = $2,
+          verification_document_number = $3,
+          verification_birth_date = $4,
+          verification_expiry_date = $5,
+          verification_country = $6,
+          verification_front_image = $7,
+          verification_back_image = $8,
+          verification_passport_image = $9,
+          verification_status = $10,
+          verification_submitted_at = $11
+        WHERE email = $12
+        `,
+        [
+          cleanType,
+          fullName.trim(),
+          documentNumber.trim(),
+          birthDate.trim(),
+          (expiryDate || "").trim(),
+          country.trim(),
+          frontImage,
+          backImage,
+          passportImage,
+          "قيد المراجعة",
+          new Date().toISOString(),
+          cleanEmail
+        ]
+      );
+
+      res.json({ message: "تم إرسال طلب التوثيق بنجاح وهو الآن قيد المراجعة" });
+    } catch (error) {
+      console.log("SUBMIT VERIFICATION ERROR:", error);
+      res.json({ message: "فشل إرسال طلب التوثيق" });
+    }
+  }
+);
+
+/* تحديث حالة التوثيق من الإدارة */
+app.post("/admin/update-verification-status", async (req, res) => {
+  const { email, status } = req.body;
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const cleanStatus = (status || "").trim();
+
+  if (!cleanEmail || !cleanStatus) {
+    return res.json({ message: "أدخل البريد والحالة" });
+  }
+
+  if (!["موثق", "مرفوض", "قيد المراجعة", "غير موثق"].includes(cleanStatus)) {
+    return res.json({ message: "حالة غير صحيحة" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [cleanEmail]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ message: "الحساب غير موجود" });
+    }
+
+    await pool.query(
+      "UPDATE users SET verification_status = $1 WHERE email = $2",
+      [cleanStatus, cleanEmail]
+    );
+
+    res.json({ message: "تم تحديث حالة التوثيق بنجاح" });
+  } catch (error) {
+    console.log("ADMIN UPDATE VERIFICATION STATUS ERROR:", error);
+    res.json({ message: "فشل تحديث حالة التوثيق" });
   }
 });
 
@@ -790,7 +1062,6 @@ app.post("/mark-deposit", async (req, res) => {
     }
 
     res.json({ message: "تم تسجيل أول إيداع وتوزيع مكافآت الإحالة بنجاح" });
-
   } catch (error) {
     console.log("MARK DEPOSIT ERROR:", error);
     res.json({ message: "فشل تسجيل الإيداع" });
@@ -852,11 +1123,23 @@ app.get("/my-referral-info", async (req, res) => {
       first_deposit_amount: Number(user.first_deposit_amount || 0),
       levels: stats
     });
-
   } catch (error) {
     console.log("MY REFERRAL INFO ERROR:", error);
     res.json({ message: "فشل جلب بيانات الإحالة" });
   }
+});
+
+/* معالجة أخطاء رفع الملفات */
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    return res.json({ message: "حصل خطأ أثناء رفع الملفات أو حجم الصورة كبير" });
+  }
+
+  if (error) {
+    return res.json({ message: error.message || "حصل خطأ غير متوقع" });
+  }
+
+  next();
 });
 
 /* تشغيل السيرفر */
