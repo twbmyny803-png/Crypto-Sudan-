@@ -90,6 +90,30 @@
       box-shadow: 0 0 0 4px rgba(36, 181, 255, 0.12);
     }
 
+    .password-wrap {
+      position: relative;
+    }
+
+    .password-wrap .input {
+      padding-left: 90px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 70px;
+      height: 34px;
+      border: none;
+      border-radius: 10px;
+      background: #12315f;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 0;
+    }
+
     .verify-box {
       margin-top: 12px;
       background: rgba(6, 19, 47, 0.7);
@@ -257,13 +281,16 @@
 
       <div class="form-group">
         <label for="password">كلمة المرور</label>
-        <input
-          type="password"
-          id="password"
-          class="input"
-          placeholder="أدخل كلمة المرور"
-          required
-        />
+        <div class="password-wrap">
+          <input
+            type="password"
+            id="password"
+            class="input"
+            placeholder="أدخل كلمة المرور"
+            required
+          />
+          <button type="button" class="toggle-password" onclick="togglePassword('password', this)">إظهار</button>
+        </div>
       </div>
 
       <div class="forgot">
@@ -289,6 +316,18 @@
     function showMessage(text, color) {
       statusMsg.textContent = text;
       statusMsg.style.color = color;
+    }
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+
+      if (input.type === "password") {
+        input.type = "text";
+        btn.innerText = "إخفاء";
+      } else {
+        input.type = "password";
+        btn.innerText = "إظهار";
+      }
     }
 
     async function sendLoginCode() {
