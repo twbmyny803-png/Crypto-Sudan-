@@ -78,6 +78,11 @@ button{
   cursor:pointer;
 }
 
+button:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
 .verify-box{
   margin-top:10px;
 }
@@ -102,6 +107,7 @@ button{
   color:#7ed8ff;
   text-align:center;
   min-height:22px;
+  line-height:1.7;
 }
 
 .register-btn{
@@ -140,7 +146,7 @@ button{
     <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
 
     <div class="verify-box">
-      <button type="button" onclick="sendCode()">إرسال كود التحقق</button>
+      <button type="button" id="sendCodeBtn" onclick="sendCode()">إرسال كود التحقق</button>
 
       <div class="verify-row">
         <input type="text" id="code" placeholder="أدخل كود التحقق">
@@ -174,6 +180,12 @@ let time = 60;
 let timer = null;
 
 const msg = document.getElementById("statusMsg");
+const sendCodeBtn = document.getElementById("sendCodeBtn");
+
+function showMessage(text, color) {
+  msg.innerText = text;
+  msg.style.color = color;
+}
 
 async function sendCode() {
   const fullname = document.getElementById("fullname").value.trim();
@@ -181,8 +193,7 @@ async function sendCode() {
   const password = document.getElementById("password").value.trim();
 
   if (!fullname || !email || !password) {
-    msg.innerText = "أدخل الاسم والبريد وكلمة المرور أولاً";
-    msg.style.color = "#ff8080";
+    showMessage("أدخل الاسم والبريد وكلمة المرور أولاً", "#ff8080");
     return;
   }
 
@@ -200,35 +211,46 @@ async function sendCode() {
     });
 
     const data = await res.json();
-    msg.innerText = data.message;
+    const message = data.message || "";
 
-    if (res.ok) {
-      msg.style.color = "#7ed8ff";
+    if (message.includes("تم إرسال كود التحقق")) {
       verified = false;
+      showMessage(message, "#7ed8ff");
       startCountdown();
-    } else {
-      msg.style.color = "#ff8080";
+      return;
     }
+
+    if (message.includes("مسجل بالفعل")) {
+      verified = false;
+      showMessage(message, "#ff8080");
+      return;
+    }
+
+    verified = false;
+    showMessage(message || "فشل إنشاء الحساب", "#ff8080");
+
   } catch (error) {
     console.log(error);
-    msg.innerText = "حصل خطأ في الاتصال بالسيرفر";
-    msg.style.color = "#ff8080";
+    verified = false;
+    showMessage("حصل خطأ في الاتصال بالسيرفر", "#ff8080");
   }
 }
 
 function startCountdown() {
   clearInterval(timer);
   time = 60;
+  sendCodeBtn.disabled = true;
 
   timer = setInterval(function () {
-    msg.innerText = "تم إرسال كود التحقق (" + time + " ثانية)";
-    msg.style.color = "#7ed8ff";
+    sendCodeBtn.innerText = "إعادة الإرسال (" + time + " ثانية)";
+    showMessage("تم إرسال كود التحقق (" + time + " ثانية)", "#7ed8ff");
     time--;
 
     if (time < 0) {
       clearInterval(timer);
-      msg.innerText = "يمكنك إعادة إرسال الكود الآن";
-      msg.style.color = "#6cff9f";
+      sendCodeBtn.disabled = false;
+      sendCodeBtn.innerText = "إرسال كود التحقق";
+      showMessage("يمكنك إعادة إرسال الكود الآن", "#6cff9f");
     }
   }, 1000);
 }
@@ -238,8 +260,7 @@ async function verifyCode() {
   const code = document.getElementById("code").value.trim();
 
   if (!email || !code) {
-    msg.innerText = "أدخل البريد وكود التحقق";
-    msg.style.color = "#ff8080";
+    showMessage("أدخل البريد وكود التحقق", "#ff8080");
     return;
   }
 
@@ -256,19 +277,19 @@ async function verifyCode() {
     });
 
     const data = await res.json();
-    msg.innerText = data.message;
+    const message = data.message || "";
 
-    if (data.message.includes("تم التحقق")) {
+    if (message.includes("تم التحقق")) {
       verified = true;
-      msg.style.color = "#6cff9f";
+      showMessage(message, "#6cff9f");
     } else {
       verified = false;
-      msg.style.color = "#ff8080";
+      showMessage(message || "الكود غير صحيح", "#ff8080");
     }
   } catch (error) {
     console.log(error);
-    msg.innerText = "حصل خطأ في الاتصال بالسيرفر";
-    msg.style.color = "#ff8080";
+    verified = false;
+    showMessage("حصل خطأ في الاتصال بالسيرفر", "#ff8080");
   }
 }
 
@@ -281,25 +302,21 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
   const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
   if (!fullname || !email || !password || !confirmPassword) {
-    msg.innerText = "املأ كل البيانات المطلوبة";
-    msg.style.color = "#ff8080";
+    showMessage("املأ كل البيانات المطلوبة", "#ff8080");
     return;
   }
 
   if (password !== confirmPassword) {
-    msg.innerText = "كلمتا المرور غير متطابقتين";
-    msg.style.color = "#ff8080";
+    showMessage("كلمتا المرور غير متطابقتين", "#ff8080");
     return;
   }
 
   if (!verified) {
-    msg.innerText = "يجب التحقق من البريد الإلكتروني أولاً";
-    msg.style.color = "#ff8080";
+    showMessage("يجب التحقق من البريد الإلكتروني أولاً", "#ff8080");
     return;
   }
 
-  msg.innerText = "تم إنشاء الحساب بنجاح، سيتم تحويلك إلى تسجيل الدخول...";
-  msg.style.color = "#6cff9f";
+  showMessage("تم إنشاء الحساب بنجاح، سيتم تحويلك إلى تسجيل الدخول...", "#6cff9f");
 
   setTimeout(() => {
     window.location.href = "login.html";
