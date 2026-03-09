@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>السحب - Sudan Crypto</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tajawal, Arial;
+}
+
+body{
+background:linear-gradient(180deg,#0a1d3a,#071431);
+color:white;
+min-height:100vh;
+padding:20px 20px 100px;
+}
+
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:30px;
+font-weight:bold;
+color:#1cc4ff;
+}
+
+.back-btn{
+background:#0c183c;
+color:white;
+border:none;
+border-radius:14px;
+padding:12px 18px;
+font-size:15px;
+cursor:pointer;
+}
+
+.page-card{
+max-width:760px;
+margin:0 auto;
+background:linear-gradient(180deg,#0c183c,#0a1636);
+border-radius:26px;
+padding:22px;
+box-shadow:0 18px 40px rgba(0,0,0,0.35);
+}
+
+.page-title{
+font-size:28px;
+color:#ffffff;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+.page-sub{
+color:#d7e6ff;
+line-height:1.9;
+font-size:15px;
+margin-bottom:18px;
+}
+
+.form-box{
+background:#10214b;
+border-radius:20px;
+padding:18px;
+margin-bottom:18px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.form-box label{
+display:block;
+margin-bottom:8px;
+margin-top:12px;
+font-size:14px;
+color:#dce8ff;
+}
+
+.form-box select,
+.form-box input{
+width:100%;
+height:50px;
+border:none;
+outline:none;
+border-radius:14px;
+background:#091632;
+color:white;
+padding:0 14px;
+font-size:15px;
+}
+
+.form-box input::placeholder{
+color:#7f92bd;
+}
+
+.form-action{
+width:100%;
+height:50px;
+border:none;
+border-radius:16px;
+background:linear-gradient(90deg,#ff8a00,#ff3d6e);
+color:white;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+margin-top:16px;
+}
+
+.note-box{
+background:#13285a;
+border-radius:18px;
+padding:16px;
+margin-top:12px;
+color:#e6f0ff;
+font-size:14px;
+line-height:1.9;
+}
+
+.empty-box{
+background:#10214b;
+border-radius:20px;
+padding:18px;
+text-align:center;
+color:#9fb0d3;
+line-height:1.9;
+}
+
+.status{
+margin-top:14px;
+min-height:24px;
+font-size:14px;
+text-align:center;
+line-height:1.8;
+}
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+right:0;
+left:0;
+background:#081532;
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+border-top:1px solid #162a5a;
+z-index:100;
+}
+
+.bottom-nav a{
+text-align:center;
+font-size:12px;
+color:white;
+text-decoration:none;
+line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+<button class="back-btn" onclick="window.location.href='account.html'">← الرجوع</button>
+<div class="logo">Sudan Crypto</div>
+</div>
+
+<div class="page-card">
+<div class="page-title">طلب سحب</div>
+<div class="page-sub">
+اختر عنوان المحفظة المحفوظ، ثم أدخل مبلغ السحب وكلمة مرور السحب لإرسال الطلب.
+</div>
+  <div id="withdrawContent">
+
+<div class="form-box">
+<label>اختر عنوان السحب</label>
+<select id="withdrawWalletSelect" onchange="updateSelectedWalletInfo()">
+<option value="">جاري تحميل العناوين...</option>
+</select>
+
+<label>الشبكة</label>
+<input type="text" id="withdrawNetwork" placeholder="سيظهر نوع الشبكة تلقائياً" readonly>
+
+<label>عنوان المحفظة</label>
+<input type="text" id="withdrawAddress" placeholder="سيظهر عنوان المحفظة تلقائياً" readonly>
+
+<label>المبلغ</label>
+<input type="number" id="withdrawAmount" placeholder="أدخل مبلغ السحب">
+
+<label>كلمة مرور السحب</label>
+<input type="password" id="withdrawPassword" placeholder="أدخل كلمة مرور السحب">
+
+<button class="form-action" onclick="submitWithdrawRequest()">إرسال طلب السحب</button>
+
+<div class="note-box">
+يجب التأكد من اختيار عنوان السحب الصحيح قبل إرسال الطلب. يتم استخدام العناوين المحفوظة فقط، ولا يمكن السحب بدون كلمة مرور السحب.
+</div>
+</div>
+
+<div class="status" id="withdrawStatus"></div>
+
+</div>
+
+<div id="noWalletsBox" class="empty-box" style="display:none;">
+لا توجد عناوين سحب محفوظة حالياً.<br>
+قم أولاً بإضافة عنوان محفظة من صفحة <strong>ربط المحفظة</strong>.
+<br><br>
+<button class="form-action" onclick="window.location.href='wallets.html'">الذهاب إلى ربط المحفظة</button>
+</div>
+
+</div>
+
+<div class="bottom-nav">
+<a href="dashboard.html">🏠<p>الرئيسية</p></a>
+<a href="offers.html">📢<p>العروض</p></a>
+<a href="history.html">📄<p>السجل</p></a>
+<a href="account.html">👤<p>حسابي</p></a>
+</div>
+  <script>
+function getLoggedInEmail(){
+return (localStorage.getItem("loggedInEmail") || "").trim().toLowerCase();
+}
+
+function getWalletStorageKey(){
+const email = getLoggedInEmail();
+return "wallet_addresses_" + email;
+}
+
+function getWithdrawStorageKey(){
+const email = getLoggedInEmail();
+return "withdraw_requests_" + email;
+}
+
+function showWithdrawStatus(text,color){
+const box = document.getElementById("withdrawStatus");
+box.innerText = text;
+box.style.color = color;
+}
+
+function getSavedWallets(){
+const key = getWalletStorageKey();
+const raw = localStorage.getItem(key);
+
+if(!raw){
+return [];
+}
+
+try{
+const data = JSON.parse(raw);
+if(Array.isArray(data)){
+return data;
+}
+return [];
+}catch(error){
+return [];
+}
+}
+
+function getSavedWithdrawRequests(){
+const key = getWithdrawStorageKey();
+const raw = localStorage.getItem(key);
+
+if(!raw){
+return [];
+}
+
+try{
+const data = JSON.parse(raw);
+if(Array.isArray(data)){
+return data;
+}
+return [];
+}catch(error){
+return [];
+}
+}
+
+function saveWithdrawRequests(requests){
+const key = getWithdrawStorageKey();
+localStorage.setItem(key, JSON.stringify(requests));
+}
+
+function loadWalletOptions(){
+const wallets = getSavedWallets();
+const select = document.getElementById("withdrawWalletSelect");
+
+if(wallets.length === 0){
+document.getElementById("withdrawContent").style.display = "none";
+document.getElementById("noWalletsBox").style.display = "block";
+return;
+}
+
+document.getElementById("withdrawContent").style.display = "block";
+document.getElementById("noWalletsBox").style.display = "none";
+
+select.innerHTML = `<option value="">اختر عنوان السحب</option>` + wallets.map((wallet,index) => {
+return `<option value="${index}">${wallet.network} - العنوان ${index + 1}</option>`;
+}).join("");
+}
+    function updateSelectedWalletInfo(){
+const wallets = getSavedWallets();
+const selectedIndex = document.getElementById("withdrawWalletSelect").value;
+
+if(selectedIndex === ""){
+document.getElementById("withdrawNetwork").value = "";
+document.getElementById("withdrawAddress").value = "";
+return;
+}
+
+const wallet = wallets[Number(selectedIndex)];
+
+if(!wallet){
+document.getElementById("withdrawNetwork").value = "";
+document.getElementById("withdrawAddress").value = "";
+return;
+}
+
+document.getElementById("withdrawNetwork").value = wallet.network || "";
+document.getElementById("withdrawAddress").value = wallet.address || "";
+}
+
+function generateWithdrawId(){
+return "WDR-" + Date.now() + "-" + Math.floor(1000 + Math.random() * 9000);
+}
+
+async function submitWithdrawRequest(){
+const email = getLoggedInEmail();
+const wallets = getSavedWallets();
+const selectedIndex = document.getElementById("withdrawWalletSelect").value;
+const amount = Number(document.getElementById("withdrawAmount").value);
+const withdrawPassword = document.getElementById("withdrawPassword").value.trim();
+
+if(!email){
+showWithdrawStatus("يجب تسجيل الدخول أولاً", "#ff8080");
+return;
+}
+
+if(selectedIndex === ""){
+showWithdrawStatus("اختر عنوان السحب أولاً", "#ff8080");
+return;
+}
+
+const wallet = wallets[Number(selectedIndex)];
+
+if(!wallet){
+showWithdrawStatus("عنوان السحب غير موجود", "#ff8080");
+return;
+}
+
+if(!amount || amount <= 0){
+showWithdrawStatus("أدخل مبلغ سحب صحيح", "#ff8080");
+return;
+}
+
+if(!withdrawPassword){
+showWithdrawStatus("أدخل كلمة مرور السحب", "#ff8080");
+return;
+}
+
+const requests = getSavedWithdrawRequests();
+
+requests.unshift({
+request_id: generateWithdrawId(),
+email: email,
+network: wallet.network || "",
+address: wallet.address || "",
+amount: amount,
+withdraw_password: withdrawPassword,
+status: "قيد المراجعة",
+created_at: new Date().toISOString()
+});
+
+saveWithdrawRequests(requests);
+
+document.getElementById("withdrawWalletSelect").value = "";
+document.getElementById("withdrawNetwork").value = "";
+document.getElementById("withdrawAddress").value = "";
+document.getElementById("withdrawAmount").value = "";
+document.getElementById("withdrawPassword").value = "";
+
+showWithdrawStatus("تم إرسال طلب السحب بنجاح وهو الآن قيد المراجعة", "#6cff9f");
+    }
+    loadWalletOptions();
+updateSelectedWalletInfo();
+</script>
+
+</body>
+</html>
