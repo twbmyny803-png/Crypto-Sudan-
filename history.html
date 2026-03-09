@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudan Crypto - سجل العمليات</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Tajawal, Arial, sans-serif;
+}
+
+body{
+  min-height:100vh;
+  color:#fff;
+  padding:18px 16px 100px;
+  background:
+  radial-gradient(circle at top left, rgba(0,195,255,.14), transparent 24%),
+  radial-gradient(circle at bottom right, rgba(124,58,237,.18), transparent 28%),
+  linear-gradient(180deg,#07184a 0%, #081f5c 35%, #071431 100%);
+}
+
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.logo{
+  font-size:30px;
+  font-weight:700;
+  color:#1ec7ff;
+}
+
+.back-btn{
+  background:#0c1f4a;
+  color:white;
+  padding:10px 16px;
+  border-radius:12px;
+  text-decoration:none;
+  font-size:14px;
+  border:1px solid rgba(81,131,255,.15);
+  display:inline-block;
+}
+
+.page-card{
+  max-width:900px;
+  margin:0 auto;
+  background:rgba(8,23,58,.95);
+  border:1px solid rgba(81,131,255,.15);
+  border-radius:26px;
+  padding:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.22);
+}
+
+.page-title{
+  font-size:28px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:8px;
+}
+
+.page-sub{
+  color:#c4d0ea;
+  line-height:1.8;
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.summary-card{
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+}
+
+.summary-number{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:#fff;
+}
+
+.summary-label{
+  font-size:13px;
+  color:#b9c9ea;
+  line-height:1.6;
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.filter-btn{
+  border:none;
+  border-radius:14px;
+  padding:12px 16px;
+  background:#10214b;
+  color:#fff;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+}
+
+.filter-btn.active{
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+}
+
+.status-box{
+  min-height:24px;
+  text-align:center;
+  font-size:14px;
+  line-height:1.7;
+  margin-bottom:14px;
+  color:#b9c9ea;
+}
+
+.empty-box{
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  border-radius:22px;
+  padding:28px 18px;
+  text-align:center;
+  color:#c4d0ea;
+  line-height:1.9;
+  display:none;
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.item{
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  border-radius:22px;
+  padding:18px;
+}
+
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.item-title{
+  font-size:18px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:6px;
+}
+
+.item-sub{
+  color:#b9c9ea;
+  font-size:13px;
+  line-height:1.8;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:110px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.badge-pending-payment{
+  background:rgba(255, 193, 7, 0.18);
+  color:#ffd54f;
+}
+
+.badge-review{
+  background:rgba(33, 150, 243, 0.18);
+  color:#7ed8ff;
+}
+
+.badge-success{
+  background:rgba(76, 175, 80, 0.18);
+  color:#7dffb0;
+}
+
+.badge-rejected{
+  background:rgba(244, 67, 54, 0.18);
+  color:#ff9ca8;
+}
+
+.badge-cancelled{
+  background:rgba(158, 158, 158, 0.18);
+  color:#d7d7d7;
+}
+
+.details-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.detail-box{
+  background:#0c1f4a;
+  border-radius:16px;
+  padding:12px;
+}
+
+.detail-label{
+  font-size:12px;
+  color:#aebfe6;
+  margin-bottom:7px;
+}
+
+.detail-value{
+  font-size:15px;
+  color:#fff;
+  line-height:1.7;
+  word-break:break-word;
+}
+
+.note-box{
+  background:#10214b;
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:14px;
+}
+
+.note-title{
+  font-size:13px;
+  color:#aebfe6;
+  margin-bottom:7px;
+}
+
+.note-value{
+  font-size:14px;
+  color:#fff;
+  line-height:1.8;
+}
+
+.receipt-box{
+  margin-top:10px;
+}
+
+.receipt-link{
+  display:inline-block;
+  text-decoration:none;
+  color:#fff;
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:700;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  right:0;
+  left:0;
+  background:#081532;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #162a5a;
+  z-index:100;
+}
+
+.bottom-nav a{
+  text-align:center;
+  font-size:12px;
+  color:white;
+  text-decoration:none;
+  line-height:1.6;
+}
+
+.bottom-nav a.active{
+  color:#1ec7ff;
+  font-weight:700;
+}
+
+@media (max-width: 720px){
+  .summary-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .details-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 520px){
+  .summary-grid{
+    grid-template-columns:1fr;
+  }
+
+  .page-title{
+    font-size:24px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">Sudan Crypto</div>
+  <a href="dashboard.html" class="back-btn">← الرجوع</a>
+</div>
+
+<div class="page-card">
+  <div class="page-title">سجل العمليات</div>
+  <div class="page-sub">
+    هنا تظهر كل طلبات الإيداع الخاصة بك، سواء كانت قيد الدفع أو قيد المراجعة أو ناجحة أو مرفوضة أو ملغية بعد انتهاء الوقت.
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-number" id="allCount">0</div>
+      <div class="summary-label">كل الطلبات</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-number" id="successCount">0</div>
+      <div class="summary-label">الطلبات الناجحة</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-number" id="reviewCount">0</div>
+      <div class="summary-label">قيد المراجعة</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-number" id="cancelCount">0</div>
+      <div class="summary-label">ملغي / مرفوض</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
+    <button class="filter-btn" onclick="setFilter('قيد الدفع', this)">قيد الدفع</button>
+    <button class="filter-btn" onclick="setFilter('قيد المراجعة', this)">قيد المراجعة</button>
+    <button class="filter-btn" onclick="setFilter('ناجح', this)">ناجح</button>
+    <button class="filter-btn" onclick="setFilter('مرفوض', this)">مرفوض</button>
+    <button class="filter-btn" onclick="setFilter('ملغي', this)">ملغي</button>
+  </div>
+
+  <div class="status-box" id="statusBox">جاري تحميل السجل...</div>
+
+  <div class="empty-box" id="emptyBox">
+    لا توجد عمليات مطابقة لهذا الفلتر حالياً.
+  </div>
+
+  <div class="list" id="historyList"></div>
+</div>
+
+<div class="bottom-nav">
+  <a href="dashboard.html">🏠<p>الرئيسية</p></a>
+  <a href="offers.html">📢<p>العروض</p></a>
+  <a href="history.html" class="active">📄<p>السجل</p></a>
+  <a href="account.html">👤<p>حسابي</p></a>
+</div>
+
+<script>
+let allDeposits = [];
+let currentFilter = "all";
+
+function getLoggedInEmail() {
+  return localStorage.getItem("loggedInEmail") || localStorage.getItem("email") || "";
+}
+
+function showStatus(text, color) {
+  const box = document.getElementById("statusBox");
+  box.innerText = text;
+  box.style.color = color || "#b9c9ea";
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return "---";
+  const date = new Date(dateValue);
+  if (isNaN(date.getTime())) return "---";
+
+  return date.toLocaleString("ar-EG", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function getBadgeClass(status) {
+  if (status === "قيد الدفع") return "badge badge-pending-payment";
+  if (status === "قيد المراجعة") return "badge badge-review";
+  if (status === "ناجح") return "badge badge-success";
+  if (status === "مرفوض") return "badge badge-rejected";
+  if (status === "ملغي") return "badge badge-cancelled";
+  return "badge badge-cancelled";
+}
+
+function updateSummary() {
+  const successCount = allDeposits.filter(item => item.status === "ناجح").length;
+  const reviewCount = allDeposits.filter(item => item.status === "قيد المراجعة").length;
+  const cancelCount = allDeposits.filter(item => item.status === "ملغي" || item.status === "مرفوض").length;
+
+  document.getElementById("allCount").innerText = allDeposits.length;
+  document.getElementById("successCount").innerText = successCount;
+  document.getElementById("reviewCount").innerText = reviewCount;
+  document.getElementById("cancelCount").innerText = cancelCount;
+}
+
+function setFilter(filterValue, btn) {
+  currentFilter = filterValue;
+
+  document.querySelectorAll(".filter-btn").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  const emptyBox = document.getElementById("emptyBox");
+  list.innerHTML = "";
+
+  const filtered = currentFilter === "all"
+    ? allDeposits
+    : allDeposits.filter(item => item.status === currentFilter);
+
+  if (!filtered.length) {
+    emptyBox.style.display = "block";
+    showStatus("تم تحميل السجل", "#6cff9f");
+    return;
+  }
+
+  emptyBox.style.display = "none";
+
+  filtered.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "item";
+
+    card.innerHTML = `
+      <div class="item-top">
+        <div>
+          <div class="item-title">${item.plan_name || "إيداع مباشر"}</div>
+          <div class="item-sub">رقم الطلب: ${item.request_id || "---"}</div>
+        </div>
+        <div class="${getBadgeClass(item.status)}">${item.status || "---"}</div>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-box">
+          <div class="detail-label">الشبكة</div>
+          <div class="detail-value">${item.network_name || item.network_code || "---"}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">المبلغ</div>
+          <div class="detail-value">${Number(item.amount || 0)} USDT</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">عنوان الإيداع</div>
+          <div class="detail-value">${item.deposit_address || "---"}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">TXID</div>
+          <div class="detail-value">${item.txid || "---"}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">وقت إنشاء الطلب</div>
+          <div class="detail-value">${formatDate(item.created_at)}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">انتهاء الوقت</div>
+          <div class="detail-value">${formatDate(item.expires_at)}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">وقت إرسال الإثبات</div>
+          <div class="detail-value">${formatDate(item.submitted_at)}</div>
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-label">وقت المراجعة</div>
+          <div class="detail-value">${formatDate(item.reviewed_at)}</div>
+        </div>
+      </div>
+
+      <div class="note-box">
+        <div class="note-title">ملاحظة النظام / المراجعة</div>
+        <div class="note-value">${item.review_note || "لا توجد ملاحظات"}</div>
+      </div>
+
+      ${
+        item.receipt_image
+          ? `<div class="receipt-box"><a class="receipt-link" href="${item.receipt_image}" target="_blank">عرض صورة الإيصال</a></div>`
+          : ""
+      }
+    `;
+
+    list.appendChild(card);
+  });
+
+  showStatus("تم تحميل السجل بنجاح", "#6cff9f");
+}
+
+async function loadHistory() {
+  const email = getLoggedInEmail();
+
+  if (!email) {
+    showStatus("يجب تسجيل الدخول أولاً", "#ff8080");
+    document.getElementById("emptyBox").style.display = "block";
+    return;
+  }
+
+  try {
+    showStatus("جاري تحميل العمليات...", "#7ed8ff");
+
+    const res = await fetch("/my-deposit-requests?email=" + encodeURIComponent(email));
+    const data = await res.json();
+
+    if (data.message) {
+      showStatus(data.message, "#ff8080");
+      document.getElementById("emptyBox").style.display = "block";
+      return;
+    }
+
+    allDeposits = Array.isArray(data.deposits) ? data.deposits : [];
+    updateSummary();
+    renderHistory();
+
+  } catch (error) {
+    console.log(error);
+    showStatus("حصل خطأ أثناء تحميل السجل", "#ff8080");
+    document.getElementById("emptyBox").style.display = "block";
+  }
+}
+
+loadHistory();
+setInterval(loadHistory, 30000);
+</script>
+
+</body>
+  </html>
