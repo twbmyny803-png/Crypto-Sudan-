@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الشركاء - Sudan Crypto</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Tajawal, Arial;
+}
+
+body{
+  background:linear-gradient(180deg,#0a1d3a,#071431);
+  color:white;
+  min-height:100vh;
+  padding:20px 20px 100px;
+}
+
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:30px;
+  font-weight:bold;
+  color:#1cc4ff;
+}
+
+.back-btn{
+  background:#0c183c;
+  color:white;
+  border:none;
+  border-radius:14px;
+  padding:12px 18px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.page-card{
+  max-width:980px;
+  margin:0 auto;
+  background:linear-gradient(180deg,#0c183c,#0a1636);
+  border-radius:26px;
+  padding:22px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+}
+
+.page-title{
+  font-size:30px;
+  color:#ffffff;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+.page-sub{
+  color:#d7e6ff;
+  line-height:1.9;
+  font-size:15px;
+  margin-bottom:18px;
+}
+
+.intro-box{
+  background:#10214b;
+  border-radius:20px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,0.05);
+  margin-bottom:20px;
+}
+
+.intro-text{
+  color:#e4eeff;
+  line-height:2;
+  font-size:15px;
+}
+
+.location-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+  color:white;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.partners-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.partner-card{
+  background:#10214b;
+  border-radius:22px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,0.05);
+  box-shadow:0 10px 24px rgba(0,0,0,0.2);
+}
+
+.partner-top{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:14px;
+}
+
+.partner-logo{
+  width:64px;
+  height:64px;
+  border-radius:18px;
+  background:white;
+  padding:10px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+.partner-name{
+  font-size:20px;
+  font-weight:bold;
+  color:#ffffff;
+}
+
+.partner-role{
+  color:#9fc3ff;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.partner-desc{
+  color:#dce8ff;
+  font-size:14px;
+  line-height:1.9;
+}
+
+.final-box{
+  margin-top:20px;
+  background:#13285a;
+  border-radius:20px;
+  padding:18px;
+}
+
+.final-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#7dffb0;
+}
+
+.final-text{
+  color:#e6f0ff;
+  line-height:2;
+  font-size:14px;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  right:0;
+  left:0;
+  background:#081532;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #162a5a;
+  z-index:100;
+}
+
+.bottom-nav a{
+  text-align:center;
+  font-size:12px;
+  color:white;
+  text-decoration:none;
+  line-height:1.6;
+}
+
+@media (max-width:700px){
+  .partners-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:520px){
+  .page-title{
+    font-size:24px;
+  }
+
+  .partner-name{
+    font-size:18px;
+  }
+
+  .partner-desc{
+    font-size:13px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">← الرجوع</button>
+  <div class="logo">Sudan Crypto</div>
+</div>
+
+<div class="page-card">
+  <div class="page-title">شركاؤنا حول العالم</div>
+  <div class="page-sub">
+    نعمل مع شبكات وتقنيات مالية عالمية من أجل تقديم تجربة أكثر أماناً وسرعة وموثوقية لمستخدمي منصة Sudan Crypto.
+  </div>
+
+  <div class="intro-box">
+    <div class="intro-text">
+      نحن في <strong>Sudan Crypto</strong> نؤمن أن بناء منصة رقمية قوية يبدأ من بنية تحتية موثوقة وشراكات تقنية فعالة. لذلك نعتمد على مجموعة من أبرز الشبكات والمنصات العالمية في مجال البلوكشين والأصول الرقمية، من أجل دعم عمليات الإيداع والسحب، تحسين سرعة المعاملات، وتعزيز حماية المستخدمين.
+      <br><br>
+      ومن خلال هذه البيئة التقنية المتطورة، نسعى إلى تقديم تجربة استخدام احترافية تجمع بين الاستقرار، الأداء، وسهولة الوصول إلى الخدمات المالية الرقمية الحديثة.
+      <br><br>
+      يقع مقر أعمالنا التشغيلي في <strong>California, USA</strong>، ونعمل على توسيع شراكاتنا الدولية باستمرار من أجل تطوير خدمات المنصة ورفع مستوى الجودة والثقة لمستخدمينا حول العالم.
+    </div>
+
+    <div class="location-badge">📍 California, USA</div>
+  </div>
+
+  <div class="partners-grid">
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png?v=040" alt="Binance">
+        <div>
+          <div class="partner-name">Binance</div>
+          <div class="partner-role">شريك في منظومة الأصول الرقمية</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        تعد Binance من أبرز الأسماء في سوق الأصول الرقمية العالمي، وتمثل مرجعاً مهماً في بيئة التداول الحديثة. وجودها ضمن المشهد التقني الذي تستلهم منه المنصة يعزز الثقة والاتصال بالمعايير العالمية في هذا القطاع.
+      </div>
+    </div>
+
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://cryptologos.cc/logos/tron-trx-logo.png?v=040" alt="TRON">
+        <div>
+          <div class="partner-name">TRON</div>
+          <div class="partner-role">شبكة تحويل عالية السرعة</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        تعتبر TRON من أكثر الشبكات استخداماً في تحويل الأصول الرقمية بسرعة وكفاءة، خاصة في المعاملات التي تتطلب رسوماً منخفضة وسرعة تنفيذ عالية، وهو ما يجعلها مناسبة لعمليات الإيداع والسحب اليومية.
+      </div>
+    </div>
+
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=040" alt="Ethereum">
+        <div>
+          <div class="partner-name">Ethereum</div>
+          <div class="partner-role">بنية تحتية عالمية للبلوكشين</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        تعد Ethereum من أهم شبكات البلوكشين في العالم، وتوفر بيئة قوية تعتمد عليها الكثير من التطبيقات والعقود الذكية. وجودها ضمن البنية المرجعية للمنصة يمنح موثوقية أكبر وارتباطاً بأحد أقوى الأنظمة التقنية في المجال.
+      </div>
+    </div>
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=040" alt="Tether USDT">
+        <div>
+          <div class="partner-name">Tether (USDT)</div>
+          <div class="partner-role">عملة مستقرة للمعاملات الرقمية</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        تعتبر USDT واحدة من أكثر العملات المستقرة استخداماً في العالم، وتوفر وسيلة عملية ومرنة لتنفيذ المعاملات الرقمية مع ارتباط قيمتها بالدولار الأمريكي، مما يجعلها خياراً أساسياً في عمليات الإيداع والسحب داخل المنصة.
+      </div>
+    </div>
+
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" alt="CoinMarketCap">
+        <div>
+          <div class="partner-name">CoinMarketCap</div>
+          <div class="partner-role">مرجع عالمي لمعلومات السوق</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        توفر CoinMarketCap مرجعاً عالمياً موثوقاً لمتابعة أسعار العملات الرقمية وحركة السوق والبيانات الأساسية للمشاريع، وهو ما يساعد في تعزيز الرؤية السوقية وربط المستخدمين بالمشهد الرقمي العالمي بشكل أوضح.
+      </div>
+    </div>
+
+    <div class="partner-card">
+      <div class="partner-top">
+        <img class="partner-logo" src="https://www.blockchain.com/favicon.ico" alt="Blockchain.com">
+        <div>
+          <div class="partner-name">Blockchain.com</div>
+          <div class="partner-role">خدمات بنية تحتية ومحافظ رقمية</div>
+        </div>
+      </div>
+      <div class="partner-desc">
+        يعد Blockchain.com اسماً معروفاً عالمياً في خدمات البلوكشين والمحافظ الرقمية، ويمثل أحد الرموز البارزة في تطور البنية التحتية للأصول الرقمية والخدمات المساندة للمستخدمين حول العالم.
+      </div>
+    </div>
+  </div>
+  <div class="final-box">
+    <div class="final-title">رؤية مستقبلية</div>
+    <div class="final-text">
+      تواصل <strong>Sudan Crypto</strong> الاستثمار في بناء علاقات تقنية قوية مع أفضل الجهات في هذا القطاع، بهدف تقديم منصة تجمع بين الثقة، الأداء، والتطور المستمر. نحن نؤمن أن قوة المنصة لا تقاس فقط بالخدمات الحالية، بل أيضاً بقدرتها على النمو والتكامل مع المنظومة العالمية للأصول الرقمية.
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="dashboard.html">🏠<p>الرئيسية</p></a>
+  <a href="offers.html">📢<p>العروض</p></a>
+  <a href="history.html">📄<p>السجل</p></a>
+  <a href="account.html">👤<p>حسابي</p></a>
+</div>
+
+</body>
+</html>
