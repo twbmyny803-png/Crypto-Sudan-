@@ -3,237 +3,237 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudan Crypto - دخول تسجيل</title>
+  <title>Sudan Crypto - تسجيل الدخول</title>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Tahoma", Arial, sans-serif;
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:"Tahoma", Arial, sans-serif;
     }
 
-    body {
-      min-height: 100vh;
+    body{
+      min-height:100vh;
       background:
-        radial-gradient(circle at top right, rgba(0, 170, 255, 0.12), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(140, 82, 255, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(0,170,255,0.12), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(140,82,255,0.12), transparent 30%),
         linear-gradient(180deg, #07102b 0%, #09122f 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      color: #fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      color:#fff;
     }
 
-    .card {
-      width: 100%;
-      max-width: 620px;
-      background: rgba(10, 20, 52, 0.92);
-      border: 1px solid rgba(85, 120, 255, 0.18);
-      border-radius: 36px;
-      padding: 40px 28px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px);
+    .card{
+      width:100%;
+      max-width:620px;
+      background:rgba(10,20,52,0.92);
+      border:1px solid rgba(85,120,255,0.18);
+      border-radius:36px;
+      padding:40px 28px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.35);
+      backdrop-filter:blur(10px);
     }
 
-    .title {
-      font-size: 58px;
-      line-height: 1.05;
-      font-weight: 700;
-      color: #18b8ff;
-      margin-bottom: 14px;
-      text-align: left;
-      direction: ltr;
+    .title{
+      font-size:58px;
+      line-height:1.05;
+      font-weight:700;
+      color:#18b8ff;
+      margin-bottom:14px;
+      text-align:left;
+      direction:ltr;
     }
 
-    .subtitle {
-      color: #aeb8d8;
-      font-size: 18px;
-      margin-bottom: 34px;
-      text-align: center;
+    .subtitle{
+      color:#aeb8d8;
+      font-size:18px;
+      margin-bottom:34px;
+      text-align:center;
     }
 
-    .form-group {
-      margin-bottom: 22px;
+    .form-group{
+      margin-bottom:22px;
     }
 
-    label {
-      display: block;
-      margin-bottom: 12px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #eef3ff;
+    label{
+      display:block;
+      margin-bottom:12px;
+      font-size:18px;
+      font-weight:600;
+      color:#eef3ff;
     }
 
     .input,
-    .code-input {
-      width: 100%;
-      height: 64px;
-      border-radius: 22px;
-      border: 1px solid rgba(65, 119, 255, 0.24);
-      background: #071634;
-      color: #fff;
-      padding: 0 20px;
-      font-size: 18px;
-      outline: none;
-      transition: 0.25s ease;
+    .code-input{
+      width:100%;
+      height:64px;
+      border-radius:22px;
+      border:1px solid rgba(65,119,255,0.24);
+      background:#071634;
+      color:#fff;
+      padding:0 20px;
+      font-size:18px;
+      outline:none;
+      transition:0.25s ease;
     }
 
     .input::placeholder,
-    .code-input::placeholder {
-      color: #7f8aa8;
+    .code-input::placeholder{
+      color:#7f8aa8;
     }
 
     .input:focus,
-    .code-input:focus {
-      border-color: #24b5ff;
-      box-shadow: 0 0 0 4px rgba(36, 181, 255, 0.12);
+    .code-input:focus{
+      border-color:#24b5ff;
+      box-shadow:0 0 0 4px rgba(36,181,255,0.12);
     }
 
-    .password-wrap {
-      position: relative;
+    .password-wrap{
+      position:relative;
     }
 
-    .password-wrap .input {
-      padding-left: 90px;
+    .password-wrap .input{
+      padding-left:90px;
     }
 
-    .toggle-password {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 70px;
-      height: 34px;
-      border: none;
-      border-radius: 10px;
-      background: #12315f;
-      color: #fff;
-      font-size: 12px;
-      cursor: pointer;
-      margin: 0;
+    .toggle-password{
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      width:70px;
+      height:34px;
+      border:none;
+      border-radius:10px;
+      background:#12315f;
+      color:#fff;
+      font-size:12px;
+      cursor:pointer;
+      margin:0;
+    }
+    .verify-box{
+      margin-top:12px;
+      background:rgba(6,19,47,0.7);
+      border:1px solid rgba(71,128,255,0.16);
+      border-radius:24px;
+      padding:18px;
     }
 
-    .verify-box {
-      margin-top: 12px;
-      background: rgba(6, 19, 47, 0.7);
-      border: 1px solid rgba(71, 128, 255, 0.16);
-      border-radius: 24px;
-      padding: 18px;
+    .verify-title{
+      font-size:16px;
+      color:#dfe7ff;
+      margin-bottom:14px;
+      font-weight:600;
     }
 
-    .verify-title {
-      font-size: 16px;
-      color: #dfe7ff;
-      margin-bottom: 14px;
-      font-weight: 600;
+    .verify-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .verify-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .verify-row .code-input {
-      flex: 1;
-      min-width: 180px;
+    .verify-row .code-input{
+      flex:1;
+      min-width:180px;
     }
 
     .send-btn,
-    .verify-btn {
-      height: 64px;
-      border: none;
-      border-radius: 20px;
-      padding: 0 22px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
-      transition: 0.25s ease;
-      background: linear-gradient(90deg, #12b8ff, #7b35ff);
-      box-shadow: 0 10px 25px rgba(59, 117, 255, 0.25);
+    .verify-btn{
+      height:64px;
+      border:none;
+      border-radius:20px;
+      padding:0 22px;
+      font-size:17px;
+      font-weight:700;
+      cursor:pointer;
+      color:#fff;
+      transition:0.25s ease;
+      background:linear-gradient(90deg, #12b8ff, #7b35ff);
+      box-shadow:0 10px 25px rgba(59,117,255,0.25);
     }
 
-    .send-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    .send-btn:disabled{
+      opacity:0.7;
+      cursor:not-allowed;
     }
 
-    .helper-text {
-      margin-top: 10px;
-      color: #9db0d1;
-      font-size: 14px;
-      line-height: 1.7;
+    .helper-text{
+      margin-top:10px;
+      color:#9db0d1;
+      font-size:14px;
+      line-height:1.7;
     }
 
-    .status {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #77d3ff;
-      min-height: 22px;
-      line-height: 1.8;
-      text-align: center;
+    .status{
+      margin-top:12px;
+      font-size:14px;
+      color:#77d3ff;
+      min-height:22px;
+      line-height:1.8;
+      text-align:center;
     }
 
-    .forgot {
-      text-align: right;
-      margin: 6px 0 26px;
+    .forgot{
+      text-align:right;
+      margin:6px 0 26px;
     }
 
     .forgot a,
-    .bottom-link a {
-      color: #27c3ff;
-      text-decoration: none;
-      font-size: 17px;
+    .bottom-link a{
+      color:#27c3ff;
+      text-decoration:none;
+      font-size:17px;
     }
 
-    .login-btn {
-      width: 100%;
-      height: 78px;
-      border: none;
-      border-radius: 26px;
-      cursor: pointer;
-      color: #fff;
-      font-size: 24px;
-      font-weight: 800;
-      background: linear-gradient(90deg, #18b9ff, #7d35ff);
-      box-shadow: 0 14px 30px rgba(68, 111, 255, 0.25);
-      margin-top: 12px;
-      transition: 0.25s ease;
+    .login-btn{
+      width:100%;
+      height:78px;
+      border:none;
+      border-radius:26px;
+      cursor:pointer;
+      color:#fff;
+      font-size:24px;
+      font-weight:800;
+      background:linear-gradient(90deg, #18b9ff, #7d35ff);
+      box-shadow:0 14px 30px rgba(68,111,255,0.25);
+      margin-top:12px;
+      transition:0.25s ease;
     }
 
-    .bottom-link {
-      text-align: center;
-      margin-top: 28px;
-      font-size: 18px;
-      color: #aeb8d8;
+    .bottom-link{
+      text-align:center;
+      margin-top:28px;
+      font-size:18px;
+      color:#aeb8d8;
     }
 
-    @media (max-width: 640px) {
-      .card {
-        padding: 32px 20px;
-        border-radius: 28px;
+    @media (max-width:640px){
+      .card{
+        padding:32px 20px;
+        border-radius:28px;
       }
 
-      .title {
-        font-size: 44px;
+      .title{
+        font-size:44px;
       }
 
-      .login-btn {
-        height: 70px;
-        font-size: 22px;
+      .login-btn{
+        height:70px;
+        font-size:22px;
       }
 
       .send-btn,
-      .verify-btn,
       .input,
-      .code-input {
-        height: 58px;
+      .code-input{
+        height:58px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="card">
     <h1 class="title">Sudan<br>Crypto</h1>
@@ -251,11 +251,11 @@
         />
 
         <div class="verify-box">
-          <div class="verify-title">التحقق من البريد الإلكتروني بإرسال الكود</div>
+          <div class="verify-title">إرسال كود تسجيل الدخول إلى البريد الإلكتروني</div>
 
-          <div class="verify-row" style="margin-bottom: 12px;">
+          <div class="verify-row" style="margin-bottom:12px;">
             <button type="button" class="send-btn" id="sendBtn" onclick="sendLoginCode()">
-              إرسال كود التحقق
+              إرسال كود الدخول
             </button>
           </div>
 
@@ -264,21 +264,17 @@
               type="text"
               id="verificationCode"
               class="code-input"
-              placeholder="أدخل كود التحقق"
+              placeholder="أدخل كود تسجيل الدخول"
             />
-            <button type="button" class="verify-btn" onclick="markCodeEntered()">
-              تحقق من الكود
-            </button>
           </div>
 
           <div class="helper-text">
-            سيتم إرسال كود التحقق إلى بريدك الإلكتروني للتأكد من صحة الحساب قبل تسجيل الدخول.
+            بعد الضغط على زر إرسال الكود، سيتم إرسال كود الدخول إلى بريدك الإلكتروني. أدخل الكود هنا ثم اضغط تسجيل الدخول مباشرة.
           </div>
 
           <div class="status" id="statusMsg"></div>
         </div>
-      </div>
-
+      </div> 
       <div class="form-group">
         <label for="password">كلمة المرور</label>
         <div class="password-wrap">
@@ -308,7 +304,6 @@
   <script>
     let countdown = 60;
     let timer = null;
-    let codeChecked = false;
 
     const statusMsg = document.getElementById("statusMsg");
     const sendBtn = document.getElementById("sendBtn");
@@ -350,47 +345,34 @@
         const data = await res.json();
         const message = data.message || "";
 
-        if (message.includes("تم إرسال كود تسجيل الدخول")) {
+        if (message.includes("تم إرسال")) {
           showMessage(message, "#77d3ff");
-          codeChecked = false;
           startCountdown();
         } else {
-          showMessage(message, "#ff9ca8");
+          showMessage(message || "تعذر إرسال الكود", "#ff9ca8");
         }
       } catch (error) {
         console.log(error);
         showMessage("حصل خطأ في الاتصال بالسيرفر", "#ff9ca8");
       }
     }
-
     function startCountdown() {
       clearInterval(timer);
       countdown = 60;
       sendBtn.disabled = true;
+      sendBtn.textContent = "إعادة الإرسال (" + countdown + " ثانية)";
 
       timer = setInterval(() => {
-        sendBtn.textContent = "إعادة الإرسال (" + countdown + " ثانية)";
         countdown--;
+        sendBtn.textContent = "إعادة الإرسال (" + countdown + " ثانية)";
 
-        if (countdown < 0) {
+        if (countdown <= 0) {
           clearInterval(timer);
           sendBtn.disabled = false;
-          sendBtn.textContent = "إرسال كود التحقق";
+          sendBtn.textContent = "إرسال كود الدخول";
           showMessage("يمكنك إعادة إرسال الكود الآن", "#59f0a9");
         }
       }, 1000);
-    }
-
-    function markCodeEntered() {
-      const code = document.getElementById("verificationCode").value.trim();
-
-      if (!code) {
-        showMessage("الرجاء إدخال كود التحقق.", "#ff9ca8");
-        return;
-      }
-
-      codeChecked = true;
-      showMessage("تم إدخال الكود، أكمل تسجيل الدخول.", "#59f0a9");
     }
 
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
@@ -402,11 +384,6 @@
 
       if (!email || !password || !code) {
         showMessage("الرجاء تعبئة جميع الحقول.", "#ff9ca8");
-        return;
-      }
-
-      if (!codeChecked) {
-        showMessage("اضغط تحقق من الكود أولاً.", "#ff9ca8");
         return;
       }
 
@@ -432,15 +409,17 @@
           localStorage.setItem("loggedInEmail", email);
           localStorage.setItem("email", email);
 
-          if (data.name) {
-            localStorage.setItem("loggedInName", data.name);
+          if (data.name && data.name.trim()) {
+            localStorage.setItem("loggedInName", data.name.trim());
+          } else {
+            localStorage.removeItem("loggedInName");
           }
 
           setTimeout(() => {
             window.location.href = "dashboard.html";
           }, 1200);
         } else {
-          showMessage(message, "#ff9ca8");
+          showMessage(message || "فشل تسجيل الدخول", "#ff9ca8");
         }
       } catch (error) {
         console.log(error);
