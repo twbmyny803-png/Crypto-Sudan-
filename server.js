@@ -1144,15 +1144,57 @@ app.post("/admin/update-verification-status", async (req, res) => {
 
 /* فتح طلب إيداع جديد */
 app.post("/create-deposit-request", async (req, res) => {
-  const { email, planName, networkCode, networkName, depositAddress, amount } = req.body;
+  const {
+    email,
+    planName,
+    networkKey,
+    networkCode,
+    networkName,
+    depositAddress,
+    amount
+  } = req.body;
+
   const cleanEmail = (email || "").trim().toLowerCase();
   const cleanPlanName = (planName || "").trim();
-  const cleanNetworkCode = (networkCode || "").trim();
-  const cleanNetworkName = (networkName || "").trim();
-  const cleanDepositAddress = (depositAddress || "").trim();
+  const finalNetworkCode = (networkCode || networkKey || "").trim();
   const depositAmount = Number(amount);
 
-  if (!cleanEmail || !cleanNetworkCode || !cleanNetworkName || !cleanDepositAddress || !depositAmount || depositAmount <= 0) {
+  const NETWORKS = {
+    USDT_TRC20: {
+      network_name: "USDT - TRC20",
+      deposit_address: "TLPZEoW71BNe6mHPK8XRJ5PkN5Agqqpa5n"
+    },
+    USDT_BEP20: {
+      network_name: "USDT - BEP20",
+      deposit_address: "0x990635c24b47a3ebbc14efadf0355e26ec706385"
+    },
+    USDT_ERC20: {
+      network_name: "USDT - ERC20",
+      deposit_address: "0x990635c24b47a3ebbc14efadf0355e26ec706385"
+    },
+    USDC_BEP20: {
+      network_name: "USDC - BEP20",
+      deposit_address: "0x990635c24b47a3ebbc14efadf0355e26ec706385"
+    },
+    USDC_ERC20: {
+      network_name: "USDC - ERC20",
+      deposit_address: "0x990635c24b47a3ebbc14efadf0355e26ec706385"
+    },
+    BTC: {
+      network_name: "Bitcoin - BTC",
+      deposit_address: "1J4rcHG7afaEEFQL9o7GDcNc9noAZE6DVf"
+    },
+    ETH: {
+      network_name: "Ethereum - ETH",
+      deposit_address: "0x990635c24b47a3ebbc14efadf0355e26ec706385"
+    }
+  };
+
+  const selectedNetwork = NETWORKS[finalNetworkCode] || null;
+  const finalNetworkName = (networkName || (selectedNetwork ? selectedNetwork.network_name : "") || "").trim();
+  const finalDepositAddress = (depositAddress || (selectedNetwork ? selectedNetwork.deposit_address : "") || "").trim();
+
+  if (!cleanEmail || !finalNetworkCode || !finalNetworkName || !finalDepositAddress || !depositAmount || depositAmount <= 0) {
     return res.json({ message: "املأ بيانات طلب الإيداع بشكل صحيح" });
   }
 
@@ -1184,16 +1226,25 @@ app.post("/create-deposit-request", async (req, res) => {
       const activeRequest = activeRequestResult.rows[0];
       return res.json({
         message: "لديك طلب إيداع مفتوح بالفعل",
-        request_id: activeRequest.request_id,
-        expires_at: activeRequest.expires_at,
-        status: activeRequest.status
+        request: {
+          request_id: activeRequest.request_id,
+          email: activeRequest.email,
+          plan_name: activeRequest.plan_name,
+          network_code: activeRequest.network_code,
+          network_name: activeRequest.network_name,
+          deposit_address: activeRequest.deposit_address,
+          amount: Number(activeRequest.amount || 0),
+          status: activeRequest.status,
+          expires_at: activeRequest.expires_at,
+          created_at: activeRequest.created_at
+        }
       });
     }
 
     const requestId = await createUniqueDepositRequestId();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    await pool.query(
+    const insertResult = await pool.query(
       `
       INSERT INTO deposit_requests (
         request_id,
@@ -1208,24 +1259,36 @@ app.post("/create-deposit-request", async (req, res) => {
         expires_at
       )
       VALUES ($1,$2,$3,$4,$5,$6,$7,'قيد الدفع',NOW(),$8)
+      RETURNING *
       `,
       [
         requestId,
         cleanEmail,
         cleanPlanName,
-        cleanNetworkCode,
-        cleanNetworkName,
-        cleanDepositAddress,
+        finalNetworkCode,
+        finalNetworkName,
+        finalDepositAddress,
         depositAmount,
         expiresAt
       ]
     );
 
+    const newRequest = insertResult.rows[0];
+
     res.json({
       message: "تم فتح طلب الإيداع بنجاح",
-      request_id: requestId,
-      status: "قيد الدفع",
-      expires_at: expiresAt
+      request: {
+        request_id: newRequest.request_id,
+        email: newRequest.email,
+        plan_name: newRequest.plan_name,
+        network_code: newRequest.network_code,
+        network_name: newRequest.network_name,
+        deposit_address: newRequest.deposit_address,
+        amount: Number(newRequest.amount || 0),
+        status: newRequest.status,
+        expires_at: newRequest.expires_at,
+        created_at: newRequest.created_at
+      }
     });
   } catch (error) {
     console.log("CREATE DEPOSIT REQUEST ERROR:", error);
