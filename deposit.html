@@ -1,259 +1,767 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>الإيداع</title>
+<title>Sudan Crypto - الإيداع</title>
 
 <style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Tajawal, Arial, sans-serif;
+}
 
 body{
-background:#050505;
-color:white;
-font-family:Tahoma;
-padding:20px;
+  min-height:100vh;
+  color:#fff;
+  padding:18px 16px 100px;
+  background:
+  radial-gradient(circle at top left, rgba(0,195,255,.14), transparent 24%),
+  radial-gradient(circle at bottom right, rgba(124,58,237,.18), transparent 28%),
+  linear-gradient(180deg,#07184a 0%, #081f5c 35%, #071431 100%);
 }
 
-.box{
-background:#202020;
-padding:20px;
-border-radius:15px;
-margin-bottom:20px;
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
 }
 
-input,select{
-
-width:100%;
-padding:12px;
-margin-top:10px;
-margin-bottom:15px;
-border-radius:8px;
-border:none;
-
+.logo{
+  font-size:30px;
+  font-weight:700;
+  color:#1ec7ff;
 }
 
-button{
-
-width:100%;
-padding:14px;
-background:#ff1d1d;
-color:white;
-border:none;
-border-radius:10px;
-font-size:18px;
-
+.back-btn{
+  background:#0c1f4a;
+  color:white;
+  padding:10px 16px;
+  border-radius:12px;
+  text-decoration:none;
+  font-size:14px;
+  border:1px solid rgba(81,131,255,.15);
+  display:inline-block;
 }
 
-.address{
-
-background:#111;
-padding:12px;
-border-radius:8px;
-word-break:break-all;
-
+.page-card{
+  max-width:760px;
+  margin:0 auto;
+  background:rgba(8,23,58,.95);
+  border:1px solid rgba(81,131,255,.15);
+  border-radius:26px;
+  padding:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.22);
 }
 
-.timer{
-
-font-size:22px;
-text-align:center;
-margin:15px 0;
-
+.page-title{
+  font-size:28px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:8px;
 }
 
+.page-sub{
+  color:#c4d0ea;
+  line-height:1.8;
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.highlight-box{
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:16px;
+}
+
+.highlight-title{
+  font-size:13px;
+  color:#b9c9ea;
+  margin-bottom:8px;
+}
+
+.highlight-value{
+  font-size:18px;
+  font-weight:700;
+  color:#fff;
+  line-height:1.7;
+  word-break:break-word;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.input-group{
+  margin-bottom:14px;
+}
+
+.input-group.full{
+  grid-column:1 / -1;
+}
+
+.input-group label{
+  display:block;
+  margin-bottom:8px;
+  color:#dce8ff;
+  font-size:13px;
+}
+
+.input-group input,
+.input-group select{
+  width:100%;
+  height:50px;
+  border:none;
+  outline:none;
+  border-radius:14px;
+  background:#091632;
+  color:white;
+  padding:0 14px;
+  font-size:15px;
+}
+
+.input-group input[type="file"]{
+  height:auto;
+  padding:12px;
+}
+
+.network-card{
+  margin-top:18px;
+  padding:16px;
+  border-radius:20px;
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  display:none;
+}
+
+.network-card.active{
+  display:block;
+}
+
+.network-top{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.network-name{
+  font-size:18px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:6px;
+}
+
+.network-note{
+  color:#b9c9ea;
+  font-size:13px;
+  line-height:1.8;
+}
+
+.tag{
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+  color:#fff;
+  padding:8px 12px;
+  border-radius:14px;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.address-box{
+  background:#0c1f4a;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.address-label{
+  color:#b9c9ea;
+  font-size:13px;
+  margin-bottom:8px;
+}
+
+.address-value{
+  font-size:15px;
+  color:#fff;
+  line-height:1.8;
+  word-break:break-all;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+.btn{
+  width:100%;
+  height:52px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn.secondary{
+  background:#16305f;
+}
+
+.qr-box{
+  margin-top:14px;
+  display:flex;
+  justify-content:center;
+}
+
+.qr-inner{
+  background:white;
+  border-radius:20px;
+  padding:12px;
+  width:190px;
+  height:190px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.qr-inner img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:12px;
+  display:block;
+}
+
+.deposit-flow{
+  margin-top:18px;
+  padding:16px;
+  background:#10214b;
+  border-radius:18px;
+}
+
+.flow-title{
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:10px;
+  color:#fff;
+}
+
+.flow-text{
+  color:#c4d0ea;
+  font-size:13px;
+  line-height:1.9;
+}
+
+.request-box{
+  margin-top:18px;
+  padding:16px;
+  border-radius:20px;
+  background:#081532;
+  border:1px solid rgba(81,131,255,.12);
+  display:none;
+}
+
+.request-box.active{
+  display:block;
+}
+
+.request-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+
+.request-title{
+  font-size:18px;
+  font-weight:700;
+}
+
+.countdown{
+  font-size:22px;
+  font-weight:700;
+  color:#ffd54f;
+}
+
+.request-status{
+  margin-top:14px;
+  min-height:24px;
+  text-align:center;
+  font-size:14px;
+  line-height:1.7;
+}
+
+.small-note{
+  margin-top:10px;
+  color:#b9c9ea;
+  font-size:12px;
+  line-height:1.8;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  right:0;
+  left:0;
+  background:#081532;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #162a5a;
+  z-index:100;
+}
+
+.bottom-nav a{
+  text-align:center;
+  font-size:12px;
+  color:white;
+  text-decoration:none;
+  line-height:1.6;
+}
+
+.bottom-nav a.active{
+  color:#1ec7ff;
+  font-weight:700;
+}
+
+@media (max-width: 640px){
+  .form-grid,
+  .actions{
+    grid-template-columns:1fr;
+  }
+
+  .page-title{
+    font-size:24px;
+  }
+}
 </style>
-
 </head>
-
 <body>
 
-
-<h2>إيداع</h2>
-
-
-<div class="box">
-
-<label>اختر الشبكة</label>
-
-<select id="network">
-
-<option value="">اختر</option>
-
-<option value="USDT_TRC20">USDT TRC20</option>
-
-<option value="USDT_BEP20">USDT BEP20</option>
-
-<option value="USDT_ERC20">USDT ERC20</option>
-
-<option value="USDC_BEP20">USDC BEP20</option>
-
-<option value="USDC_ERC20">USDC ERC20</option>
-
-<option value="BTC">BTC</option>
-
-<option value="ETH">ETH</option>
-
-</select>
-
-
-<label>المبلغ</label>
-
-<input id="amount" type="number" placeholder="ادخل المبلغ">
-
-
-<button onclick="createDeposit()">فتح طلب الإيداع</button>
-
+<div class="top-bar">
+  <div class="logo">Sudan Crypto</div>
+  <a href="dashboard.html" class="back-btn">← الرجوع</a>
 </div>
 
+<div class="page-card">
+  <div class="page-title">الإيداع</div>
+  <div class="page-sub">
+    اختر الشبكة المناسبة، افتح طلب الإيداع، ثم أرسل التحويل وارفع TXID وصورة الإيصال خلال 15 دقيقة.
+  </div>
 
-<div class="box" id="depositBox" style="display:none">
+  <div class="highlight-box">
+    <div class="highlight-title">الباقة / العرض المحدد</div>
+    <div class="highlight-value" id="selectedPlanText">إيداع مباشر</div>
+  </div>
 
+  <div class="form-grid">
+    <div class="input-group">
+      <label>اختر الشبكة</label>
+      <select id="network" onchange="changeNetwork()">
+        <option value="">اختر الشبكة المناسبة</option>
+        <option value="USDT_TRC20">USDT - TRC20</option>
+        <option value="USDT_BEP20">USDT - BEP20</option>
+        <option value="USDT_ERC20">USDT - ERC20</option>
+        <option value="USDC_BEP20">USDC - BEP20</option>
+        <option value="USDC_ERC20">USDC - ERC20</option>
+        <option value="BTC">Bitcoin - BTC</option>
+        <option value="ETH">Ethereum - ETH</option>
+      </select>
+    </div>
 
-<h3>عنوان الإيداع</h3>
+    <div class="input-group">
+      <label>المبلغ</label>
+      <input id="amount" type="number" placeholder="أدخل المبلغ">
+    </div>
+  </div>
 
-<div class="address" id="address"></div>
+  <div class="network-card" id="networkCard">
+    <div class="network-top">
+      <div>
+        <div class="network-name" id="networkName">اسم الشبكة</div>
+        <div class="network-note" id="networkNote">اختر نفس الشبكة تماماً عند التحويل.</div>
+      </div>
+      <div class="tag" id="networkTag">NETWORK</div>
+    </div>
 
-<div class="timer" id="timer">15:00</div>
+    <div class="address-box">
+      <div class="address-label">عنوان الإيداع</div>
+      <div class="address-value" id="address">---</div>
+    </div>
 
+    <div class="actions">
+      <button class="btn secondary" onclick="copyAddress()">نسخ العنوان</button>
+      <button class="btn" onclick="createDeposit()">فتح طلب الإيداع</button>
+    </div>
 
-<label>TXID</label>
+    <div class="qr-box">
+      <div class="qr-inner">
+        <img id="qrImage" src="" alt="QR Code">
+      </div>
+    </div>
+  </div>
 
-<input id="txid" placeholder="اكتب رقم العملية">
+  <div class="deposit-flow">
+    <div class="flow-title">طريقة الإيداع</div>
+    <div class="flow-text">
+      1. اختر الشبكة المناسبة.<br>
+      2. اضغط فتح طلب الإيداع.<br>
+      3. حوّل المبلغ إلى العنوان الظاهر أمامك.<br>
+      4. ارفع TXID وصورة الإيصال خلال 15 دقيقة.<br>
+      5. بعد الإرسال يتحول الطلب إلى قيد المراجعة.
+    </div>
+  </div>
 
+  <div class="request-box" id="depositBox">
+    <div class="request-head">
+      <div class="request-title">طلب الإيداع المفتوح</div>
+      <div class="countdown" id="timer">15:00</div>
+    </div>
 
-<label>رفع صورة الإيصال</label>
+    <div class="form-grid">
+      <div class="input-group full">
+        <label>رقم الطلب</label>
+        <input id="requestIdView" readonly>
+      </div>
 
-<input type="file" id="receipt">
+      <div class="input-group full">
+        <label>رقم العملية TXID</label>
+        <input id="txid" placeholder="اكتب رقم العملية">
+      </div>
 
+      <div class="input-group full">
+        <label>رفع صورة الإيصال</label>
+        <input type="file" id="receipt" accept="image/*">
+      </div>
+    </div>
 
-<button onclick="submitProof()">ارسال الإثبات</button>
+    <div class="actions">
+      <button class="btn secondary" onclick="cancelDeposit()">إلغاء الطلب</button>
+      <button class="btn" onclick="submitProof()">إرسال الإثبات</button>
+    </div>
 
+    <div class="request-status" id="statusBox"></div>
+
+    <div class="small-note">
+      إذا انتهى الوقت قبل إرسال الإثبات، سيتحول الطلب تلقائياً إلى ملغي.
+    </div>
+  </div>
 </div>
 
+<div class="bottom-nav">
+  <a href="dashboard.html">🏠<p>الرئيسية</p></a>
+  <a href="offers.html">📢<p>العروض</p></a>
+  <a href="membership.html">⭐<p>العضوية</p></a>
+  <a href="account.html">👤<p>حسابي</p></a>
+</div>
 
 <script>
+const DEPOSIT_NETWORKS = {
+  USDT_TRC20: {
+    name: "USDT - TRC20",
+    tag: "TRC20",
+    address: "TLPZEoW71BNe6mHPK8XRJ5PkN5Agqqpa5n",
+    note: "أرسل فقط USDT عبر شبكة TRC20 إلى هذا العنوان."
+  },
+  USDT_BEP20: {
+    name: "USDT - BEP20",
+    tag: "BEP20",
+    address: "0x990635c24b47a3ebbc14efadf0355e26ec706385",
+    note: "أرسل فقط USDT عبر شبكة BEP20 إلى هذا العنوان."
+  },
+  USDT_ERC20: {
+    name: "USDT - ERC20",
+    tag: "ERC20",
+    address: "0x990635c24b47a3ebbc14efadf0355e26ec706385",
+    note: "أرسل فقط USDT عبر شبكة ERC20 إلى هذا العنوان."
+  },
+  USDC_BEP20: {
+    name: "USDC - BEP20",
+    tag: "BEP20",
+    address: "0x990635c24b47a3ebbc14efadf0355e26ec706385",
+    note: "أرسل فقط USDC عبر شبكة BEP20 إلى هذا العنوان."
+  },
+  USDC_ERC20: {
+    name: "USDC - ERC20",
+    tag: "ERC20",
+    address: "0x990635c24b47a3ebbc14efadf0355e26ec706385",
+    note: "أرسل فقط USDC عبر شبكة ERC20 إلى هذا العنوان."
+  },
+  BTC: {
+    name: "Bitcoin - BTC",
+    tag: "BTC",
+    address: "1J4rcHG7afaEEFQL9o7GDcNc9noAZE6DVf",
+    note: "أرسل فقط Bitcoin إلى هذا العنوان."
+  },
+  ETH: {
+    name: "Ethereum - ETH",
+    tag: "ETH",
+    address: "0x990635c24b47a3ebbc14efadf0355e26ec706385",
+    note: "أرسل فقط Ethereum إلى هذا العنوان."
+  }
+};
 
-let requestId = null
+let requestId = null;
+let timerInterval = null;
+let currentExpireTime = null;
 
-let timerInterval
+function getLoggedInEmail() {
+  let email =
+    localStorage.getItem("loggedInEmail") ||
+    localStorage.getItem("email");
 
+  if (!email) {
+    alert("يجب تسجيل الدخول أولاً");
+    window.location.href = "login.html";
+    return "";
+  }
 
-function startTimer(seconds){
-
-let time = seconds
-
-timerInterval = setInterval(()=>{
-
-let minutes = Math.floor(time/60)
-
-let sec = time % 60
-
-document.getElementById("timer").innerText = 
-minutes.toString().padStart(2,"0") + ":" +
-sec.toString().padStart(2,"0")
-
-time--
-
-if(time<0){
-
-clearInterval(timerInterval)
-
-alert("انتهى وقت الإيداع")
-
+  return email;
 }
 
-},1000)
-
+function showStatus(text, color) {
+  const box = document.getElementById("statusBox");
+  box.innerText = text;
+  box.style.color = color;
 }
 
-
-async function createDeposit(){
-
-let email = localStorage.getItem("email")
-
-let network = document.getElementById("network").value
-
-let amount = document.getElementById("amount").value
-
-
-let res = await fetch("/create-deposit-request",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-email:email,
-networkKey:network,
-amount:amount
-
-})
-
-})
-
-let data = await res.json()
-
-if(data.request){
-
-requestId = data.request.request_id
-
-document.getElementById("depositBox").style.display="block"
-
-document.getElementById("address").innerText =
-data.request.deposit_address
-
-startTimer(900)
-
+function buildQr(address) {
+  return "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + encodeURIComponent(address);
 }
 
-else{
+function changeNetwork() {
+  const networkKey = document.getElementById("network").value;
+  const network = DEPOSIT_NETWORKS[networkKey];
+  const card = document.getElementById("networkCard");
 
-alert(data.message)
+  if (!network) {
+    card.classList.remove("active");
+    return;
+  }
 
+  card.classList.add("active");
+  document.getElementById("networkName").innerText = network.name;
+  document.getElementById("networkTag").innerText = network.tag;
+  document.getElementById("networkNote").innerText = network.note;
+  document.getElementById("address").innerText = network.address;
+  document.getElementById("qrImage").src = buildQr(network.address);
 }
 
+function copyAddress() {
+  const networkKey = document.getElementById("network").value;
+  const network = DEPOSIT_NETWORKS[networkKey];
+
+  if (!network) {
+    alert("اختر الشبكة أولاً");
+    return;
+  }
+
+  navigator.clipboard.writeText(network.address).then(() => {
+    alert("تم نسخ عنوان الإيداع");
+  }).catch(() => {
+    alert("تعذر نسخ العنوان");
+  });
 }
 
+function loadSelectedPlan() {
+  const params = new URLSearchParams(window.location.search);
+  const amount = params.get("amount") || "";
+  const plan = params.get("plan") || "";
 
+  if (plan || amount) {
+    document.getElementById("selectedPlanText").innerText =
+      (decodeURIComponent(plan || "إيداع مباشر")) + (amount ? " - " + amount + " USDT" : "");
+  }
 
-async function submitProof(){
-
-let email = localStorage.getItem("email")
-
-let txid = document.getElementById("txid").value
-
-let receipt = document.getElementById("receipt").files[0]
-
-let form = new FormData()
-
-form.append("email",email)
-
-form.append("requestId",requestId)
-
-form.append("txid",txid)
-
-form.append("receiptImage",receipt)
-
-
-let res = await fetch("/submit-deposit-proof",{
-
-method:"POST",
-
-body:form
-
-})
-
-let data = await res.json()
-
-alert(data.message)
-
+  if (amount) {
+    document.getElementById("amount").value = amount;
+  }
 }
 
+function showRequestBox() {
+  document.getElementById("depositBox").classList.add("active");
+}
+
+function startTimerFromExpireTime(expireAt) {
+  clearInterval(timerInterval);
+  currentExpireTime = new Date(expireAt).getTime();
+
+  function updateTimer() {
+    const now = Date.now();
+    const diff = currentExpireTime - now;
+
+    if (diff <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById("timer").innerText = "00:00";
+      showStatus("انتهى وقت الإيداع وتم إلغاء الطلب", "#ff8080");
+      return;
+    }
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const sec = totalSeconds % 60;
+
+    document.getElementById("timer").innerText =
+      minutes.toString().padStart(2, "0") + ":" +
+      sec.toString().padStart(2, "0");
+  }
+
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+async function createDeposit() {
+  const email = getLoggedInEmail();
+  if (!email) return;
+
+  const networkKey = document.getElementById("network").value;
+  const amount = document.getElementById("amount").value.trim();
+  const params = new URLSearchParams(window.location.search);
+  const planName = params.get("plan") || "";
+
+  if (!networkKey) {
+    alert("اختر الشبكة أولاً");
+    return;
+  }
+
+  if (!amount || Number(amount) <= 0) {
+    alert("أدخل مبلغ صحيح");
+    return;
+  }
+
+  try {
+    const res = await fetch("/create-deposit-request", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        networkKey,
+        amount,
+        planName: decodeURIComponent(planName || "")
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.request) {
+      alert(data.message || "فشل فتح طلب الإيداع");
+      return;
+    }
+
+    requestId = data.request.request_id;
+    document.getElementById("requestIdView").value = requestId;
+    showRequestBox();
+    startTimerFromExpireTime(data.request.expires_at);
+    showStatus("تم فتح طلب الإيداع بنجاح، أكمل التحويل ثم أرسل الإثبات", "#6cff9f");
+
+  } catch (error) {
+    console.log(error);
+    alert("حصل خطأ في الاتصال بالسيرفر");
+  }
+}
+
+async function submitProof() {
+  const email = getLoggedInEmail();
+  if (!email) return;
+
+  const txid = document.getElementById("txid").value.trim();
+  const receipt = document.getElementById("receipt").files[0];
+
+  if (!requestId) {
+    showStatus("افتح طلب الإيداع أولاً", "#ff8080");
+    return;
+  }
+
+  if (!txid) {
+    showStatus("أدخل رقم العملية TXID", "#ff8080");
+    return;
+  }
+
+  if (!receipt) {
+    showStatus("ارفع صورة الإيصال", "#ff8080");
+    return;
+  }
+
+  try {
+    const form = new FormData();
+    form.append("email", email);
+    form.append("requestId", requestId);
+    form.append("txid", txid);
+    form.append("receiptImage", receipt);
+
+    const res = await fetch("/submit-deposit-proof", {
+      method: "POST",
+      body: form
+    });
+
+    const data = await res.json();
+
+    if ((data.message || "").includes("بنجاح") || (data.message || "").includes("قيد المراجعة")) {
+      clearInterval(timerInterval);
+      showStatus(data.message, "#6cff9f");
+    } else {
+      showStatus(data.message || "فشل إرسال الإثبات", "#ff8080");
+    }
+
+  } catch (error) {
+    console.log(error);
+    showStatus("حصل خطأ في الاتصال بالسيرفر", "#ff8080");
+  }
+}
+
+async function cancelDeposit() {
+  const email = getLoggedInEmail();
+  if (!email) return;
+
+  if (!requestId) {
+    showStatus("لا يوجد طلب مفتوح للإلغاء", "#ff8080");
+    return;
+  }
+
+  try {
+    const res = await fetch("/cancel-deposit-request", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        requestId
+      })
+    });
+
+    const data = await res.json();
+
+    if ((data.message || "").includes("تم")) {
+      clearInterval(timerInterval);
+      showStatus(data.message, "#ffb366");
+    } else {
+      showStatus(data.message || "فشل إلغاء الطلب", "#ff8080");
+    }
+
+  } catch (error) {
+    console.log(error);
+    showStatus("حصل خطأ في الاتصال بالسيرفر", "#ff8080");
+  }
+}
+
+loadSelectedPlan();
 </script>
 
 </body>
