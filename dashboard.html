@@ -50,6 +50,11 @@ background:#0c183c;
 color:white;
 font-size:18px;
 border:1px solid rgba(255,255,255,0.06);
+transition:0.2s;
+}
+
+.icons a:hover{
+background:#13285a;
 }
 
 .notice{
@@ -73,6 +78,34 @@ border-radius:20px;
 display:block;
 }
 
+.quick-actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin:0 20px 20px;
+}
+
+.quick-btn{
+text-decoration:none;
+display:flex;
+align-items:center;
+justify-content:center;
+height:56px;
+border-radius:18px;
+font-size:16px;
+font-weight:bold;
+color:white;
+box-shadow:0 12px 24px rgba(0,0,0,0.18);
+}
+
+.deposit-btn{
+background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+}
+
+.withdraw-btn{
+background:linear-gradient(90deg,#ff8a00,#ff3d6e);
+}
+
 .menu{
 display:grid;
 grid-template-columns:repeat(4,1fr);
@@ -86,8 +119,7 @@ text-decoration:none;
 color:white;
 display:block;
 }
-
-.menu-item{
+  .menu-item{
 padding:15px;
 background:#0c183c;
 border-radius:20px;
@@ -227,9 +259,8 @@ height:40px;
 border-radius:12px;
 cursor:pointer;
 font-size:20px;
-}
-
-.hero-card{
+} 
+  .hero-card{
 background:linear-gradient(135deg,#132c63,#1e3b7e);
 border-radius:22px;
 padding:18px;
@@ -354,9 +385,8 @@ cursor:pointer;
 font-size:14px;
 font-weight:bold;
 color:white;
-}
-
-.whatsapp{
+} 
+  .whatsapp{
 background:#1fa855;
 }
 
@@ -415,6 +445,10 @@ line-height:1.7;
 grid-template-columns:repeat(2,1fr);
 }
 
+.quick-actions{
+grid-template-columns:1fr;
+}
+
 .info-grid{
 grid-template-columns:1fr;
 }
@@ -460,6 +494,11 @@ margin:auto;
   <img src="https://images.unsplash.com/photo-1639322537228-f710d846310a" alt="banner">
 </div>
 
+<div class="quick-actions">
+  <a href="deposit.html" class="quick-btn deposit-btn">⬇️ الإيداع</a>
+  <a href="withdraw.html" class="quick-btn withdraw-btn">⬆️ السحب</a>
+</div>
+
 <div class="menu">
 
   <div class="menu-link" onclick="openReferralBox()">
@@ -490,9 +529,8 @@ margin:auto;
     </div>
   </a>
 
-</div>
-
-<div class="section">
+</div> 
+  <div class="section">
   <div class="section-header">
     <div class="section-title">الأفلام الشائعة</div>
     <a href="#" class="more-link">عرض المزيد</a>
@@ -576,9 +614,8 @@ margin:auto;
           <button class="action-btn" onclick="shareNative()">مشاركة عامة</button>
         </div>
       </div>
-    </div>
-
-    <div class="share-title">مشاركة سريعة</div>
+        </div>
+        <div class="share-title">مشاركة سريعة</div>
     <div class="share-row">
       <button class="share-btn whatsapp" onclick="shareWhatsApp()">واتساب</button>
       <button class="share-btn telegram" onclick="shareTelegram()">تليجرام</button>
@@ -663,7 +700,6 @@ async function openReferralBox() {
   }
 
   showReferralStatus("جاري تحميل بيانات الإحالة...", "#7ed8ff");
-
   try {
     const res = await fetch("/my-referral-info?email=" + encodeURIComponent(email));
     const data = await res.json();
@@ -735,8 +771,7 @@ function copyReferralLink() {
     showReferralStatus("تعذر نسخ رابط الإحالة", "#ff8080");
   });
 }
-
-function shareText() {
+  function shareText() {
   return "انضم إلى منصة Sudan Crypto عبر رابط الإحالة الخاص بي:\n" + currentReferralLink + "\n\nكود الإحالة: " + currentReferralCode;
 }
 
@@ -810,4 +845,4 @@ document.getElementById("referralModal").addEventListener("click", function(e) {
 </script>
 
 </body>
-        </html>
+</html>
