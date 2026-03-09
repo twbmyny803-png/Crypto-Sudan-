@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شرح النظام - Sudan Crypto</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Tajawal, Arial;
+}
+
+body{
+  background:linear-gradient(180deg,#0a1d3a,#071431);
+  color:white;
+  min-height:100vh;
+  padding:20px 20px 100px;
+}
+
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:30px;
+  font-weight:bold;
+  color:#1cc4ff;
+}
+
+.back-btn{
+  background:#0c183c;
+  color:white;
+  border:none;
+  border-radius:14px;
+  padding:12px 18px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.page-card{
+  max-width:850px;
+  margin:0 auto;
+  background:linear-gradient(180deg,#0c183c,#0a1636);
+  border-radius:26px;
+  padding:22px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+}
+
+.page-title{
+  font-size:30px;
+  color:#ffffff;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+.page-sub{
+  color:#d7e6ff;
+  line-height:1.9;
+  font-size:15px;
+  margin-bottom:20px;
+}
+
+.steps{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.step-box{
+  background:#10214b;
+  border-radius:20px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,0.05);
+}
+
+.step-title{
+  font-size:20px;
+  font-weight:bold;
+  color:#1cc4ff;
+  margin-bottom:10px;
+}
+
+.step-text{
+  color:#dce8ff;
+  font-size:15px;
+  line-height:2;
+}
+
+.note-box{
+  margin-top:20px;
+  background:#13285a;
+  border-radius:20px;
+  padding:18px;
+}
+
+.note-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#7dffb0;
+}
+
+.note-text{
+  color:#e6f0ff;
+  line-height:2;
+  font-size:14px;
+}
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  right:0;
+  left:0;
+  background:#081532;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #162a5a;
+  z-index:100;
+}
+
+.bottom-nav a{
+  text-align:center;
+  font-size:12px;
+  color:white;
+  text-decoration:none;
+  line-height:1.6;
+}
+
+@media (max-width:520px){
+  .page-title{
+    font-size:24px;
+  }
+
+  .step-title{
+    font-size:18px;
+  }
+
+  .step-text{
+    font-size:14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">← الرجوع</button>
+  <div class="logo">Sudan Crypto</div>
+</div>
+
+<div class="page-card">
+  <div class="page-title">شرح النظام</div>
+  <div class="page-sub">
+    هنا ستجد شرحاً مبسطاً لكيفية عمل المنصة، بداية من إنشاء الحساب وحتى الإيداع والاشتراك في الباقات واستلام الأرباح والسحب.
+  </div>
+
+  <div class="steps">
+    <div class="step-box">
+      <div class="step-title">1️⃣ إنشاء الحساب</div>
+      <div class="step-text">
+        قم بإنشاء حساب جديد باستخدام بريدك الإلكتروني وكلمة المرور، ثم أدخل كود التحقق الذي يتم إرساله إلى البريد حتى يتم تفعيل الحساب بنجاح.
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">2️⃣ تسجيل الدخول</div>
+      <div class="step-text">
+        بعد تفعيل الحساب يمكنك تسجيل الدخول إلى المنصة باستخدام بريدك الإلكتروني وكلمة المرور، ثم إدخال كود تسجيل الدخول المرسل إلى بريدك.
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">3️⃣ فتح طلب الإيداع</div>
+      <div class="step-text">
+        بعد الدخول إلى حسابك اختر الباقة المناسبة أو افتح صفحة الإيداع، ثم اختر الشبكة المناسبة وأرسل المبلغ إلى عنوان الإيداع الظاهر أمامك.
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">4️⃣ تفعيل الباقة والأرباح اليومية</div>
+      <div class="step-text">
+        بعد الاشتراك في الباقة تبدأ الأرباح اليومية بالتراكم تلقائياً، ويتم إضافة الأرباح إلى رصيد حسابك كل يوم حسب الباقة المختارة. ويكتمل طلب الإيداع عادة خلال <strong>3 إلى 5 دقائق</strong> بعد إرسال التحويل.
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">5️⃣ السحب</div>
+      <div class="step-text">
+        يمكنك سحب أرباحك من المنصة إلى محفظتك الرقمية بعد ربط عنوان السحب وإدخال كلمة مرور السحب، مع التحقق عبر البريد الإلكتروني لتأكيد العملية.
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title">6️⃣ نظام الإحالة</div>
+      <div class="step-text">
+        يمكنك دعوة أصدقائك إلى المنصة من خلال رابط الإحالة الخاص بك، والحصول على عمولات تصل حتى <strong>15%</strong> حسب مستويات نظام الإحالة داخل المنصة.
+      </div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <div class="note-title">ملاحظات مهمة</div>
+    <div class="note-text">
+      تأكد دائماً من اختيار الشبكة الصحيحة عند الإيداع أو السحب. كما يجب الاحتفاظ ببيانات حسابك وكلمة مرور السحب في مكان آمن. في حال وجود أي مشكلة يمكنك التواصل مع الدعم الفني أو عبر قناة المجتمع الرسمية.
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="dashboard.html">🏠<p>الرئيسية</p></a>
+  <a href="offers.html">📢<p>العروض</p></a>
+  <a href="history.html">📄<p>السجل</p></a>
+  <a href="account.html">👤<p>حسابي</p></a>
+</div>
+
+</body>
+</html>
