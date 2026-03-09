@@ -331,7 +331,7 @@
     }
 
     async function sendLoginCode() {
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
 
       if (!email) {
         showMessage("الرجاء إدخال البريد الإلكتروني أولاً.", "#ff9ca8");
@@ -396,7 +396,7 @@
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value.trim();
       const code = document.getElementById("verificationCode").value.trim();
 
@@ -428,7 +428,13 @@
 
         if (message.includes("تم تسجيل الدخول")) {
           showMessage(message, "#59f0a9");
+
           localStorage.setItem("loggedInEmail", email);
+          localStorage.setItem("email", email);
+
+          if (data.name) {
+            localStorage.setItem("loggedInName", data.name);
+          }
 
           setTimeout(() => {
             window.location.href = "dashboard.html";
