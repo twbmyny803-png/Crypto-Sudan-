@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
+/* تجهيز مجلدات رفع الملفات */
 const uploadBaseDir = path.join(__dirname, "uploads");
 const verificationDir = path.join(uploadBaseDir, "verification");
 const depositReceiptsDir = path.join(uploadBaseDir, "deposit-receipts");
@@ -32,54 +33,67 @@ app.use("/uploads", express.static(uploadBaseDir));
 function commonFileFilter(req, file, cb) {
   const allowedTypes = ["image/jpeg","image/jpg","image/png","image/webp"];
   if (!allowedTypes.includes(file.mimetype)) {
-    return cb(new Error("ارفع صورة فقط"));
+    return cb(new Error("نوع الملف غير مدعوم، ارفع صورة فقط"));
   }
   cb(null, true);
 }
 
+const verificationStorage = multer.diskStorage({
+  destination: (req,file,cb)=>cb(null,verificationDir),
+  filename:(req,file,cb)=>{
+    const ext = path.extname(file.originalname||"") || ".jpg";
+    cb(null,"verify-"+Date.now()+ext);
+  }
+});
+
+const depositStorage = multer.diskStorage({
+  destination:(req,file,cb)=>cb(null,depositReceiptsDir),
+  filename:(req,file,cb)=>{
+    const ext = path.extname(file.originalname||"") || ".jpg";
+    cb(null,"deposit-"+Date.now()+ext);
+  }
+});
+
 const verificationUpload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, verificationDir),
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname || "").toLowerCase() || ".jpg";
-      cb(null, "verify-" + Date.now() + ext);
-    }
-  }),
+  storage: verificationStorage,
   fileFilter: commonFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }
+  limits:{ fileSize:5*1024*1024 }
 });
 
 const depositUpload = multer({
-  storage: multer.diskStorage({
-    destination:
-      const pool = new Pool({
+  storage: depositStorage,
+  fileFilter: commonFileFilter,
+  limits:{ fileSize:5*1024*1024 }
+});
+app.get("/", (req,res)=>{
+  res.sendFile(path.join(__dirname,"login.html"));
+});
+
+app.get("/login",(req,res)=>{
+  res.sendFile(path.join(__dirname,"login.html"));
+});
+
+app.get("/register",(req,res)=>{
+  res.sendFile(path.join(__dirname,"register.html"));
+});
+
+app.get("/forgot",(req,res)=>{
+  res.sendFile(path.join(__dirname,"forgot.html"));
+});
+
+app.get("/verify-identity",(req,res)=>{
+  res.sendFile(path.join(__dirname,"verify.html"));
+});
+
+app.get("/deposit",(req,res)=>{
+  res.sendFile(path.join(__dirname,"deposit.html"));
+});
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl:{ rejectUnauthorized:false }
 });
 
 let codes = {};
-
-function saveCode(email, code, type){
-  codes[email] = {
-    code: code,
-    type: type,
-    time: Date.now()
-  };
-}
-
-function checkCode(email, code, type){
-  if(!codes[email]) return false;
-  if(codes[email].code !== code) return false;
-  if(codes[email].type !== type) return false;
-  return true;
-    }
-    const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "twbmyny803@gmail.com",
-    pass: "oyiivkrudpiejjbd"
-  }
-});
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!])[A-Za-z\d@$!]{8,}$/;
 
@@ -89,20 +103,28 @@ function isStrongPassword(password){
 
 function isValidWithdrawPassword(password){
   return /^\d{6}$/.test(password || "");
-    }
-      app.post("/register", async (req, res) => {
+}
 
-const { name, email, password } = req.body;
+const transporter = nodemailer.createTransport({
+  service:"gmail",
+  auth:{
+    user:"twbmyny803@gmail.com",
+    pass:"oyiivkrudpiejjbd"
+  }
+});
+app.post("/register", async (req,res)=>{
 
-if(!name || !email || !password){
+const { name, fullname, email, password } = req.body;
+const finalName = (fullname || name || "").trim();
+const cleanEmail = (email||"").trim().toLowerCase();
+
+if(!finalName || !cleanEmail || !password){
 return res.json({message:"املأ كل البيانات"});
 }
 
 if(!isStrongPassword(password)){
 return res.json({message:"كلمة المرور ضعيفة"});
 }
-
-const cleanEmail = email.trim().toLowerCase();
 
 try{
 
@@ -116,8 +138,7 @@ return res.json({message:"هذا البريد مسجل بالفعل"});
 }
 
 const code = Math.floor(100000 + Math.random()*900000).toString();
-
-saveCode(cleanEmail,code,"register");
+codes[cleanEmail] = code;
 
 await transporter.sendMail({
 from:"Sudan Crypto <twbmyny803@gmail.com>",
@@ -128,7 +149,7 @@ html:`<h2>Sudan Crypto</h2><h1>${code}</h1>`
 
 await pool.query(
 "INSERT INTO users (name,email,password,verified) VALUES ($1,$2,$3,false)",
-[name,cleanEmail,password]
+[finalName,cleanEmail,password]
 );
 
 res.json({message:"تم إرسال كود التحقق"});
@@ -136,43 +157,15 @@ res.json({message:"تم إرسال كود التحقق"});
 }catch(e){
 
 console.log(e);
-res.json({message:"فشل التسجيل"});
+res.json({message:"فشل إنشاء الحساب"});
 
 }
 
 });
-    app.post("/verify", async (req,res)=>{
+app.post("/login", async (req,res)=>{
 
-const {email,code} = req.body;
-const cleanEmail = (email || "").trim().toLowerCase();
-
-if(!checkCode(cleanEmail,code,"register")){
-return res.json({message:"الكود غير صحيح"});
-}
-
-try{
-
-await pool.query(
-"UPDATE users SET verified=true WHERE email=$1",
-[cleanEmail]
-);
-
-delete codes[cleanEmail];
-
-res.json({message:"تم التحقق بنجاح"});
-
-}catch(e){
-
-console.log(e);
-res.json({message:"فشل التحقق"});
-
-}
-
-});
-    app.post("/send-login-code", async (req,res)=>{
-
-const {email} = req.body;
-const cleanEmail = (email || "").trim().toLowerCase();
+const { email,password,code } = req.body;
+const cleanEmail = (email||"").trim().toLowerCase();
 
 try{
 
@@ -183,49 +176,19 @@ const result = await pool.query(
 
 const user = result.rows[0];
 
-if(!user) return res.json({message:"الحساب غير موجود"});
-if(!user.verified) return res.json({message:"الحساب غير مفعل"});
-
-const code = Math.floor(100000 + Math.random()*900000).toString();
-
-saveCode(cleanEmail,code,"login");
-
-await transporter.sendMail({
-from:"Sudan Crypto <twbmyny803@gmail.com>",
-to:cleanEmail,
-subject:"Login Code",
-html:`<h2>Sudan Crypto</h2><h1>${code}</h1>`
-});
-
-res.json({message:"تم إرسال كود تسجيل الدخول"});
-
-}catch(e){
-
-console.log(e);
-res.json({message:"فشل إرسال الكود"});
-
+if(!user){
+return res.json({message:"الحساب غير موجود"});
 }
 
-});
-    app.post("/login", async (req,res)=>{
+if(!user.verified){
+return res.json({message:"يجب تفعيل الحساب"});
+}
 
-const {email,password,code} = req.body;
-const cleanEmail = (email || "").trim().toLowerCase();
+if(user.password !== password){
+return res.json({message:"كلمة المرور غير صحيحة"});
+}
 
-try{
-
-const result = await pool.query(
-"SELECT * FROM users WHERE email=$1",
-[cleanEmail]
-);
-
-const user = result.rows[0];
-
-if(!user) return res.json({message:"الحساب غير موجود"});
-if(!user.verified) return res.json({message:"الحساب غير مفعل"});
-if(user.password !== password) return res.json({message:"كلمة المرور خطأ"});
-
-if(!checkCode(cleanEmail,code,"login")){
+if(!codes[cleanEmail] || codes[cleanEmail] != code){
 return res.json({message:"كود التحقق غير صحيح"});
 }
 
@@ -244,6 +207,6 @@ res.json({message:"فشل تسجيل الدخول"});
 }
 
 });
-    app.listen(PORT,()=>{
+app.listen(PORT,()=>{
 console.log("Server started on port "+PORT);
 });
