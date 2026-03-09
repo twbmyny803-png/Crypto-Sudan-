@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ربط المحفظة - Sudan Crypto</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tajawal, Arial;
+}
+
+body{
+background:linear-gradient(180deg,#0a1d3a,#071431);
+color:white;
+min-height:100vh;
+padding:20px 20px 100px;
+}
+
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:30px;
+font-weight:bold;
+color:#1cc4ff;
+}
+
+.back-btn{
+background:#0c183c;
+color:white;
+border:none;
+border-radius:14px;
+padding:12px 18px;
+font-size:15px;
+cursor:pointer;
+}
+
+.page-card{
+max-width:760px;
+margin:0 auto;
+background:linear-gradient(180deg,#0c183c,#0a1636);
+border-radius:26px;
+padding:22px;
+box-shadow:0 18px 40px rgba(0,0,0,0.35);
+}
+
+.page-title{
+font-size:28px;
+color:#ffffff;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+.page-sub{
+color:#d7e6ff;
+line-height:1.9;
+font-size:15px;
+margin-bottom:18px;
+}
+
+.form-box{
+background:#10214b;
+border-radius:20px;
+padding:18px;
+margin-bottom:18px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.form-box label{
+display:block;
+margin-bottom:8px;
+margin-top:12px;
+font-size:14px;
+color:#dce8ff;
+}
+
+.form-box select,
+.form-box input{
+width:100%;
+height:50px;
+border:none;
+outline:none;
+border-radius:14px;
+background:#091632;
+color:white;
+padding:0 14px;
+font-size:15px;
+}
+
+.form-box input::placeholder{
+color:#7f92bd;
+}
+
+.form-action{
+width:100%;
+height:50px;
+border:none;
+border-radius:16px;
+background:linear-gradient(90deg,#1cc4ff,#7d3cff);
+color:white;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+margin-top:16px;
+}
+
+.limit-note{
+margin-top:12px;
+color:#9fb0d3;
+font-size:13px;
+line-height:1.8;
+}
+
+.wallets-title{
+font-size:18px;
+font-weight:bold;
+margin:18px 0 12px;
+color:#dbe7ff;
+}
+
+.wallets-list{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+  .wallet-card{
+background:#10214b;
+border-radius:20px;
+padding:16px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.wallet-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
+}
+
+.wallet-network{
+font-size:15px;
+font-weight:bold;
+color:#1cc4ff;
+}
+
+.wallet-index{
+font-size:13px;
+color:#9fb0d3;
+}
+
+.wallet-address{
+background:#091632;
+border-radius:14px;
+padding:12px;
+word-break:break-all;
+font-size:14px;
+line-height:1.8;
+color:#ffffff;
+margin-bottom:12px;
+}
+
+.wallet-actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.small-btn{
+height:44px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-size:14px;
+font-weight:bold;
+color:white;
+}
+
+.copy-btn{
+background:#16305f;
+}
+
+.delete-btn{
+background:linear-gradient(90deg,#ff5f6d,#d93b58);
+}
+
+.empty-box{
+background:#10214b;
+border-radius:20px;
+padding:18px;
+text-align:center;
+color:#9fb0d3;
+line-height:1.9;
+}
+
+.status{
+margin-top:14px;
+min-height:24px;
+font-size:14px;
+text-align:center;
+line-height:1.8;
+}
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+right:0;
+left:0;
+background:#081532;
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+border-top:1px solid #162a5a;
+z-index:100;
+}
+
+.bottom-nav a{
+text-align:center;
+font-size:12px;
+color:white;
+text-decoration:none;
+line-height:1.6;
+}
+
+@media (max-width:520px){
+.wallet-actions{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+<button class="back-btn" onclick="window.location.href='account.html'">← الرجوع</button>
+<div class="logo">Sudan Crypto</div>
+</div>
+
+<div class="page-card">
+<div class="page-title">ربط المحفظة</div>
+<div class="page-sub">
+قم بإضافة عناوين السحب الخاصة بك لاستخدامها لاحقاً عند طلب السحب. يمكنك حفظ عنوانين فقط داخل الحساب.
+</div>
+
+<div class="form-box">
+<label>اختر الشبكة</label>
+<select id="walletNetwork">
+<option value="TRC20">TRC20</option>
+<option value="BEP20">BEP20</option>
+</select>
+
+<label>عنوان المحفظة</label>
+<input type="text" id="walletAddress" placeholder="أدخل عنوان المحفظة">
+
+<button class="form-action" onclick="saveWalletAddress()">حفظ عنوان المحفظة</button>
+
+<div class="limit-note">
+يمكنك إضافة عنوانين فقط داخل الحساب، ويجب التأكد من صحة عنوان المحفظة والشبكة قبل الحفظ.
+</div>
+</div>
+
+<div class="wallets-title">العناوين المحفوظة</div>
+
+<div class="wallets-list" id="walletsList"></div>
+
+<div class="status" id="walletStatus"></div>
+</div> 
+  <div class="bottom-nav">
+<a href="dashboard.html">🏠<p>الرئيسية</p></a>
+<a href="offers.html">📢<p>العروض</p></a>
+<a href="history.html">📄<p>السجل</p></a>
+<a href="account.html">👤<p>حسابي</p></a>
+</div>
+
+<script>
+function getLoggedInEmail(){
+return (localStorage.getItem("loggedInEmail") || "").trim().toLowerCase();
+}
+
+function getWalletStorageKey(){
+const email = getLoggedInEmail();
+return "wallet_addresses_" + email;
+}
+
+function showWalletStatus(text,color){
+const box = document.getElementById("walletStatus");
+box.innerText = text;
+box.style.color = color;
+}
+
+function getSavedWallets(){
+const key = getWalletStorageKey();
+const raw = localStorage.getItem(key);
+
+if(!raw){
+return [];
+}
+
+try{
+const data = JSON.parse(raw);
+if(Array.isArray(data)){
+return data;
+}
+return [];
+}catch(error){
+return [];
+}
+}
+
+function saveWalletsToStorage(wallets){
+const key = getWalletStorageKey();
+localStorage.setItem(key, JSON.stringify(wallets));
+}
+
+function renderWallets(){
+const wrap = document.getElementById("walletsList");
+const wallets = getSavedWallets();
+
+if(wallets.length === 0){
+wrap.innerHTML = `
+<div class="empty-box">
+لا توجد عناوين محفوظة حالياً.<br>
+أضف عنوان محفظة جديد للبدء.
+</div>
+`;
+return;
+}
+
+wrap.innerHTML = wallets.map((wallet,index) => `
+<div class="wallet-card">
+  <div class="wallet-top">
+    <div class="wallet-network">${wallet.network || ""}</div>
+    <div class="wallet-index">العنوان ${index + 1}</div>
+  </div>
+
+  <div class="wallet-address">${wallet.address || ""}</div>
+
+  <div class="wallet-actions">
+    <button class="small-btn copy-btn" onclick="copyWalletAddress(${index})">نسخ العنوان</button>
+    <button class="small-btn delete-btn" onclick="deleteWalletAddress(${index})">حذف العنوان</button>
+  </div>
+</div>
+`).join("");
+}
+  function saveWalletAddress(){
+const email = getLoggedInEmail();
+const network = document.getElementById("walletNetwork").value.trim();
+const address = document.getElementById("walletAddress").value.trim();
+
+if(!email){
+showWalletStatus("يجب تسجيل الدخول أولاً", "#ff8080");
+return;
+}
+
+if(!network || !address){
+showWalletStatus("اختر الشبكة وأدخل عنوان المحفظة", "#ff8080");
+return;
+}
+
+const wallets = getSavedWallets();
+
+if(wallets.length >= 2){
+showWalletStatus("لا يمكن إضافة أكثر من عنوانين للمحفظة", "#ff8080");
+return;
+}
+
+const alreadyExists = wallets.some(item => (item.address || "").trim() === address);
+if(alreadyExists){
+showWalletStatus("هذا العنوان محفوظ بالفعل", "#ff8080");
+return;
+}
+
+wallets.push({
+network: network,
+address: address
+});
+
+saveWalletsToStorage(wallets);
+document.getElementById("walletAddress").value = "";
+renderWallets();
+showWalletStatus("تم حفظ عنوان المحفظة بنجاح", "#6cff9f");
+}
+
+function copyWalletAddress(index){
+const wallets = getSavedWallets();
+const wallet = wallets[index];
+
+if(!wallet){
+showWalletStatus("العنوان غير موجود", "#ff8080");
+return;
+}
+
+navigator.clipboard.writeText(wallet.address).then(() => {
+showWalletStatus("تم نسخ عنوان المحفظة", "#6cff9f");
+}).catch(() => {
+showWalletStatus("تعذر نسخ العنوان", "#ff8080");
+});
+}
+
+function deleteWalletAddress(index){
+const wallets = getSavedWallets();
+
+if(index < 0 || index >= wallets.length){
+showWalletStatus("العنوان غير موجود", "#ff8080");
+return;
+}
+
+wallets.splice(index, 1);
+saveWalletsToStorage(wallets);
+renderWallets();
+showWalletStatus("تم حذف عنوان المحفظة", "#6cff9f");
+}
+
+renderWallets();
+</script>
+
+</body>
+</html>
